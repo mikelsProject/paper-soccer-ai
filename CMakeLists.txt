@@ -7,5 +7,7 @@ set(CXX_STANDARD_REQUIRED ON)
 
 
 add_executable(soccer
-    main.cpp
+    src/field.cpp
+    src/game.cpp
+    src/main.cpp
 )

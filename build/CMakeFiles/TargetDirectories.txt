@@ -1,0 +1,3 @@
+/home/micha_05/uni/sem4/aml/soccer/build/CMakeFiles/soccer.dir
+/home/micha_05/uni/sem4/aml/soccer/build/CMakeFiles/edit_cache.dir
+/home/micha_05/uni/sem4/aml/soccer/build/CMakeFiles/rebuild_cache.dir

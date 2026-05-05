@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/soccer.dir/main.cpp.o -o soccer 

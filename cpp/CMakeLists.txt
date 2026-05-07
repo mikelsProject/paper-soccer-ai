@@ -11,4 +11,4 @@ add_executable(soccer
     src/main.cpp
 )
 
-target_include_directories(soccer PRIVATE include)
+target_include_directories(soccer PRIVATE include) 

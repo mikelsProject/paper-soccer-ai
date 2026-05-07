@@ -1,114 +1,140 @@
 #include "include/field.hpp"
 
-Field::Field(int width, int height, int goalWidth)
+int Field::validated_width(int width)
 {
     if(width >= 5 && width % 2 == 1)
-        m_width = width;
+        return width;
     else
     {
         std::cout << "width has to be an odd number, at least 5\n";
-        m_width = 5;
-        std::cout << "width was set to 5\n";
+        std::cout << "width was set to 9\n";
+        return 9;
     }
+}
 
+int Field::validated_height(int height)
+{
     if(height >= 3 && height % 2 == 1)
-        m_height = height;
+        return height;
     else
     {
         std::cout << "height has to be an odd number, at least 3";
-        m_height = 7;
-        std::cout << "height was set to 7";
+        std::cout << "height was set to default 13";
+        return 13;
     }
+}
 
-    if(goalWidth >= 3 && goalWidth <= width - 2 && goalWidth % 2 == 1)
-        m_goalWidth = goalWidth;
+int Field::validated_goal_width(int goalWidth, int validWidth)
+{
+    if(goalWidth >= 3 && goalWidth <= validWidth - 2 && goalWidth % 2 == 1)
+        return goalWidth;
     else
     {
         std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field";
-        m_goalWidth = 3;
-        std::cout << "goal width was set to 3";
+        std::cout << "goal width was set to defualt 3";
+        return 3;
     }
-
-    m_verticesCount = m_width * m_height + 2 * goalWidth;
-    allowed_init();
-    visited_init();
 }
 
-void Field::allowed_init()
+void Field::calculate_positions()
 {
-    m_allowed.assign(m_verticesCount, NONE);
-
-    const int upperGoalId = 0;  //beginning of upper goal (left side)
-    const int lowerGoalId = m_verticesCount - (m_goalWidth - 1); //beginning of lower goal (left side)
+    //beginning of upper goal (left side)
+    m_pos.upperGoalId = 0;
+    //beginning of lower goal (left side)
+    m_pos.lowerGoalId = m_verticesCount - (m_goalWidth - 1); 
     
-    //can't move anywhere after scoring a goal
-    for(int id = upperGoalId; id < m_goalWidth; ++id)
-        m_allowed[id] = NONE;
-    for(int id = lowerGoalId; id < lowerGoalId + m_goalWidth; ++id)
-        m_allowed[id] = NONE;
+    //field corners
+    m_pos.topLeftCorner = m_goalWidth;
+    m_pos.topRightCorner = m_goalWidth + m_width - 1;
+    m_pos.bottomLeftCorner = m_goalWidth + m_width * (m_height - 1);
+    m_pos.bottomRightCorner = m_goalWidth + m_width * m_height - 1;
 
-    
-    const int topLeftCorner = m_goalWidth;
-    const int topRightCorner = m_goalWidth + m_width - 1;
-    const int bottomLeftCorner = m_goalWidth + m_width * (m_height - 1);
-    const int bottomRightCorner = m_goalWidth + m_width * m_height - 1;
+    //goals posts
+    m_pos.topLeftGoalPost = m_goalWidth + (m_width - m_goalWidth) / 2;
+    m_pos.topRightGoalPost = m_pos.topLeftGoalPost + m_goalWidth - 1;
+    m_pos.bottomLeftGoalPost = m_pos.bottomLeftCorner + (m_width - m_goalWidth) / 2;
+    m_pos.bottomRightGoalPost = m_pos.bottomLeftGoalPost + m_goalWidth - 1;
 
-    m_allowed[topLeftCorner] = NONE;
-    m_allowed[topRightCorner] = NONE;
-    m_allowed[bottomLeftCorner] = NONE;
-    m_allowed[bottomRightCorner] = NONE;
+    //corners of the field part without borders
+    m_pos.insideTopLeftCorner = m_pos.topLeftCorner + m_width + 1;
+    m_pos.insideTopRightCorner = m_pos.topRightCorner + m_width - 1;
+    m_pos.insideBottomLeftCorner = m_pos.bottomLeftCorner - m_width + 1;
+    m_pos.insideBottomRightCorner = m_pos.bottomRightCorner - m_width - 1;
 
+    m_pos.fieldMiddle = (m_goalWidth - 1)/2 + m_width * (m_height + 1)/2;
+
+}
+
+Field::Field(int width, int height, int goalWidth)
+    :m_width(validated_width(width)), 
+     m_height(validated_height(height)),
+     m_goalWidth(validated_goal_width(goalWidth, m_width)),
+     m_verticesCount(m_width * m_height + 2 * goalWidth)
+{
+    initialize_allowed();
+    initialize_visited();
+}
+
+void Field::initialize_allowed_vertical_borders()
+{
+    namespace Dir = Direction;
     //left border without corners
-    for(int id = topLeftCorner + m_width; id <= bottomLeftCorner - m_width; id += m_width)
-        m_allowed[id] |= UP_RIGHT | RIGHT | DOWN_RIGHT;
+    for(int id = m_pos.topLeftCorner + m_width; id <= m_pos.bottomLeftCorner - m_width; id += m_width)
+        m_allowed[id] |= Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
 
     //right border without corners
-    for(int id = topRightCorner + m_width; id <= bottomRightCorner - m_width; id += m_width)
-        m_allowed[id] |= UP_LEFT | LEFT | DOWN_LEFT;
+    for(int id = m_pos.topRightCorner + m_width; id <= m_pos.bottomRightCorner - m_width; id += m_width)
+        m_allowed[id] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask;
+}
 
-    const int topLeftGoalPost = m_goalWidth + (m_width - m_goalWidth) / 2;
-    const int topRightGoalPost = topLeftGoalPost + m_goalWidth - 1;
-    const int bottomLeftGoalPost = bottomLeftCorner + (m_width - m_goalWidth) / 2;
-    const int bottomRightGoalPost = bottomLeftGoalPost + m_goalWidth - 1;
-
-
+void Field::initialize_allowed_top_border()
+{
+    namespace Dir = Direction;
     //upper border without corners
-    for(int id = topLeftCorner + 1; id < topLeftGoalPost; ++id)
-        m_allowed[id] |= DOWN_LEFT | DOWN | DOWN_RIGHT;
+    
+    for(int id = m_pos.topLeftCorner + 1; id < m_pos.topLeftGoalPost; ++id)
+        m_allowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
     
         //goal area
-    m_allowed[topLeftGoalPost] |= DOWN_LEFT | DOWN | DOWN_RIGHT | RIGHT | UP_RIGHT;
+    m_allowed[m_pos.topLeftGoalPost] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask | Dir::RightMask | Dir::UpRightMask;
 
-    for(int id = topLeftGoalPost + 1; id < topRightGoalPost; ++id)
-        m_allowed[id] |= ALL;
+    for(int id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
+        m_allowed[id] |= Dir::All;
 
-    m_allowed[topRightGoalPost] |= UP_LEFT | LEFT | DOWN_LEFT | DOWN | DOWN_RIGHT;
+    m_allowed[m_pos.topRightGoalPost] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
         //
 
-    for(int id = topRightGoalPost + 1; id < topRightCorner; ++id)
-        m_allowed[id] |= DOWN_LEFT | DOWN | DOWN_RIGHT;
+    for(int id = m_pos.topRightGoalPost + 1; id < m_pos.topRightCorner; ++id)
+        m_allowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
     
+}
+
+void Field::initialize_allowed_bottom_border()
+{
+    namespace Dir = Direction;
     //lower border without corners
-    for(int id = bottomLeftCorner + 1; id < bottomLeftGoalPost; ++id)
-        m_allowed[id] |= UP_LEFT | UP | UP_RIGHT;
+
+    for(int id = m_pos.bottomLeftCorner + 1; id < m_pos.bottomLeftGoalPost; ++id)
+        m_allowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
     
         //goal area
-    m_allowed[bottomLeftGoalPost] |= UP_LEFT | UP | UP_RIGHT | RIGHT | DOWN_RIGHT;
+    m_allowed[m_pos.bottomLeftGoalPost] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
 
-    for(int id = bottomLeftGoalPost + 1; id < bottomRightGoalPost; ++id)
-        m_allowed[id] |= ALL;
+    for(int id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
+        m_allowed[id] |= Dir::All;
 
-    m_allowed[bottomRightGoalPost] |= DOWN_LEFT | LEFT | UP_LEFT | UP | UP_RIGHT;
+    m_allowed[m_pos.bottomRightGoalPost] |= Dir::DownLeftMask | Dir::LeftMask | Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
         //
 
-    for(int id = bottomRightGoalPost + 1; id <= bottomRightCorner - 1; ++id)
-        m_allowed[id] |= UP_LEFT | UP | UP_RIGHT;
+    for(int id = m_pos.bottomRightGoalPost + 1; id <= m_pos.bottomRightCorner - 1; ++id)
+        m_allowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
 
-    //inside
-    const int insideTopLeftCorner = topLeftCorner + m_width + 1;
-    const int insideTopRightCorner = topRightCorner + m_width - 1;
-    const int insideBottomLeftCorner = bottomLeftCorner - m_width + 1;
-    const int insideBottomRightCorner = bottomRightCorner - m_width - 1;
+}
+
+void Field::initialize_allowed_inside()
+{
+    namespace Dir = Direction;
+
     const int insideWidth = m_width - 2;
     const int insideHeight = m_height - 2;
 
@@ -116,62 +142,104 @@ void Field::allowed_init()
     {
         for(int localX = 0; localX < insideWidth; ++localX)
         {
-            m_allowed[insideTopLeftCorner + localX + m_width * localY] = ALL;
+            m_allowed[m_pos.insideTopLeftCorner + localX + m_width * localY] = Dir::All;
         }
     }
     
-        //but corners of the field are not allowed
-    m_allowed[insideTopLeftCorner] &= ~UP_LEFT;
-    m_allowed[insideTopRightCorner] &= ~UP_RIGHT;
-    m_allowed[insideBottomLeftCorner] &= ~DOWN_LEFT;
-    m_allowed[insideBottomRightCorner] &= ~DOWN_RIGHT;
+        //but corners of the field are not allowed to be moved into
+    m_allowed[m_pos.insideTopLeftCorner] &= ~Dir::UpLeftMask;
+    m_allowed[m_pos.insideTopRightCorner] &= ~Dir::UpRightMask;
+    m_allowed[m_pos.insideBottomLeftCorner] &= ~Dir::DownLeftMask;
+    m_allowed[m_pos.insideBottomRightCorner] &= ~Dir::DownRightMask;
 }
 
-void Field::visited_init()
+void Field::initialize_allowed()
 {
-    m_visited.assign(m_verticesCount, NOT_VISITED);
-    const int fieldMiddle = (m_goalWidth - 1)/2 + m_width * (m_height + 1)/2;
-    m_visited[fieldMiddle] = VISITED;   
+    namespace Dir = Direction;
+    m_allowed.assign(m_verticesCount, Dir::None);
+    
+    // Corners and score fields remain NONE intentionally.
+    // The code below only adds directions to playable border/interior fields.
+
+    initialize_allowed_vertical_borders();
+    initialize_allowed_top_border();
+    initialize_allowed_bottom_border();
+    initialize_allowed_inside();
 }
 
-void Field::neighbours_calculate()
+void Field::initialize_visited()
 {
-    std::array<int, DIRECTIONS_COUNT> directionOffset = 
+    m_visited.assign(m_verticesCount, NotVisited);
+    m_visited[m_pos.fieldMiddle] = Visited;   
+}
+
+
+void Field::calculate_regular_neighbours()
+{
+    const std::array<int, Direction::count> directionOffset = 
     { 
-        -m_width,      // 0 -> UP
-        -m_width + 1,  // 1 -> UP_RIGHT
-        1,             // 2 -> RIGHT
-        m_width + 1,   // 3 -> DOWN_RIGHT
-        m_width,       // 4 -> DOWN
-        m_width - 1,   // 5 -> DOWN_LEFT
-        -1,            // 6 -> LEFT
-        -m_width - 1   // 7 -> UP_LEFT
+        -m_width,      // 0 -> Up
+        -m_width + 1,  // 1 -> UpRight
+        1,             // 2 -> Right
+        m_width + 1,   // 3 -> DownRight
+        m_width,       // 4 -> Down
+        m_width - 1,   // 5 -> DownLeft
+        -1,            // 6 -> Left
+        -m_width - 1   // 7 -> UpLeft
     };
 
     for(int id = 0; id < m_verticesCount; ++id)
     {   
-        for(int direction = 0; direction < DIRECTIONS_COUNT; ++direction)
+        for(int direction = 0; direction < Direction::count; ++direction)
         {
             //is the bit for current direction set to 1 (allowed)
-            bool directonAllowed = m_allowed[id] & (1u << direction);
-            if(directonAllowed)
+            bool directionAllowed = m_allowed[id] & (1u << direction) != 0;
+
+            if(directionAllowed)
             {
                 m_neighbours[id][direction] =  id + directionOffset[direction];
             }
             else
             {
-                m_neighbours[id][direction] = NO_NEIGHBOUR;
+                m_neighbours[id][direction] = NoNeighbour;
             }
         }      
     }
+}
 
-    //fix edge cases - neighbours of goals (since goals have NONE allowed, so they are set correctly)
-
-    for(int id = ; id < m_goalWidth; ++id)
+void Field::fix_goal_area_neighbours()
+{
+    const int correction = (m_width - m_goalWidth) / 2;
+    
+    //top are near goal
+    m_neighbours[m_pos.topLeftGoalPost][Direction::UpRight] += correction;
+    for(int id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
     {  
-        for(int direction = 0; direction < DIRECTIONS_COUNT; ++direction)
-        m_neighbours[id][direction] = NO_NEIGHBOUR;
+        m_neighbours[id][Direction::Up] += correction;
+        m_neighbours[id][Direction::UpRight] += correction;
+        m_neighbours[id][Direction::UpLeft] += correction;
     }
+    m_neighbours[m_pos.topRightGoalPost][Direction::UpLeft] += correction; 
+
+    //bottom area near goal
+    m_neighbours[m_pos.bottomLeftGoalPost][Direction::DownRight] -= correction;
+    for(int id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
+    {
+        m_neighbours[id][Direction::DownLeft] -= correction;
+        m_neighbours[id][Direction::Down] -= correction;
+        m_neighbours[id][Direction::DownRight] -= correction; 
+    }
+    m_neighbours[m_pos.bottomRightGoalPost][Direction::DownLeft] -= correction;
+}
 
 
+void Field::calculate_neighbours()
+{
+    calculate_regular_neighbours();
+    
+    // Fix neighbours that point into score fields.
+    // Normal +/- m_width offsets do not work there 
+    // because score rows have m_goalWidth vertices, not m_width vertices
+    // (since score areas have Direction::None allowed, they are already set correctly)
+    fix_goal_area_neighbours();
 }

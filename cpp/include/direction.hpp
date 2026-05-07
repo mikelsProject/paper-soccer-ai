@@ -18,27 +18,15 @@ namespace Direction
     };
 
     enum Direction : std::uint8_t {
-        None       = 0,        // 00000000
-        UpMask         = 1 << Up,   // 00000001
+        None       = 0,                     // 00000000
+        UpMask         = 1 << Up,           // 00000001
         UpRightMask   = 1 << UpRightMask,   // 00000010
-        RightMask      = 1 << RightMask,   // 00000100
-        DownRightMask = 1 << DownRightMask,   // 00001000
-        DownMask       = 1 << DownMask,   // 00010000
-        DownLeftMask  = 1 << DownLeftMask,   // 00100000
-        LeftMask       = 1 << LeftMask,   // 01000000
-        UpLeftMask    = 1 << UpLeft,   // 10000000
-        All        = 255       // 11111111
-    };
-
-    const std::array<int, count> offset = 
-    { 
-        -m_width,      // 0 -> Up
-        -m_width + 1,  // 1 -> UpRight
-        1,             // 2 -> Right
-        m_width + 1,   // 3 -> DownRight
-        m_width,       // 4 -> Down
-        m_width - 1,   // 5 -> DownLeft
-        -1,            // 6 -> Left
-        -m_width - 1   // 7 -> UpLeft
+        RightMask      = 1 << RightMask,    // 00000100
+        DownRightMask = 1 << DownRightMask, // 00001000
+        DownMask       = 1 << DownMask,     // 00010000
+        DownLeftMask  = 1 << DownLeftMask,  // 00100000
+        LeftMask       = 1 << LeftMask,     // 01000000
+        UpLeftMask    = 1 << UpLeft,        // 10000000
+        All        = 255                    // 11111111
     };
 }

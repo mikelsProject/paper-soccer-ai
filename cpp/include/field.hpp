@@ -18,21 +18,22 @@ public:
     //const Positions& positions();
 
 private:
-    const std::uint8_t Visited = 1;
-    const std::uint8_t NotVisited = 0; 
+    const std::uint8_t Border = 1;
+    const std::uint8_t NotBorder = 0; 
     const int NoNeighbour = -1;
     
 private:
-    int m_width;    // number of vertices in x direction, NOT number of edges
-    int m_height;   // number of vertices in y direction, NOT number of edges
+    int m_width;     // number of vertices in x direction, NOT number of edges
+    int m_height;    // number of vertices in y direction, NOT number of edges
     int m_goalWidth; // number of vertices of a goal, including posts
     int m_verticesCount;
 
-    std::vector<std::uint8_t> m_allowed; //directions in which we can still move
-    std::vector<std::uint8_t> m_visited; //Verticies which were already visited 0 - not visited, 1 - visited
+    std::vector<std::uint8_t> m_allowed; //mask of directions in which we can still move from each vertex
+    std::vector<std::uint8_t> m_border; //Verticies which are part of the border 0 - not border, 1 - border
     std::vector<std::array<int, Direction::count>> m_neighbours; //look up table which return id of a vertex 
                                                   //to which we will move if we apply a direction on a vertex
-    std::vector<int> m_path;
+
+    std::vector<int> m_path; // TODO ? maybe this should be only in Game. 
 
     struct Positions
     {
@@ -74,7 +75,7 @@ private:
     
     
 
-    void initialize_visited();
+    void calculate_border();
     
     void calculate_neighbours();
     void calculate_regular_neighbours();

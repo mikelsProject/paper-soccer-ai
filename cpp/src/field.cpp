@@ -69,7 +69,7 @@ Field::Field(int width, int height, int goalWidth)
      m_pos(calculate_positions(m_width, m_height, m_goalWidth, m_verticesCount))
 {
     initialize_allowed();
-    initialize_visited();
+    calculate_border();
 }
 
 
@@ -166,10 +166,40 @@ void Field::initialize_allowed()
 }
 
 
-void Field::initialize_visited()
+void Field::calculate_border()
 {
-    m_visited.assign(m_verticesCount, NotVisited);
-    m_visited[m_pos.fieldMiddle] = Visited;   
+    const std::uint8_t Border = 1;
+    const std::uint8_t NotBorder = 0;
+    m_border.assign(m_verticesCount, NotBorder);
+    m_border[m_pos.fieldMiddle] = Border;   
+
+    //upper border without score area
+    for(int id = m_pos.upperGoalId; id < m_pos.upperGoalId + m_goalWidth; ++id)
+        m_border[id] = Border;
+
+    for(int id = m_pos.topLeftCorner; id <= m_pos.topLeftGoalPost; ++id)
+        m_border[id] = Border;
+    
+    for(int id = m_pos.topRightGoalPost; id <= m_pos.topRightCorner; ++id)
+        m_border[id] = Border;
+    
+    //left border
+    for(int id = m_pos.topLeftCorner; id <= m_pos.bottomLeftCorner; id += m_width)
+        m_border[id] = Border;
+
+    //right border
+    for(int id = m_pos.topRightCorner; id <= m_pos.bottomRightCorner; id += m_width)
+        m_border[id] = Border;
+
+    //lower border with score area
+    for(int id = m_pos.lowerGoalId; id < m_pos.lowerGoalId + m_goalWidth; ++id)
+        m_border[id] = Border;
+
+    for(int id = m_pos.bottomLeftCorner; id <= m_pos.bottomLeftGoalPost; ++id)
+        m_border[id] = Border;
+
+    for(int id = m_pos.bottomRightGoalPost; id <= m_pos.bottomRightCorner; ++id)
+        m_border[id] = Border;
 }
 
 

@@ -17,7 +17,7 @@ namespace Direction
         UpLeft    = 7
     };
 
-    enum Direction : std::uint8_t {
+    enum Mask : std::uint8_t {
         None       = 0,                 // 00000000
         UpMask         = 1 << Up,       // 00000001
         UpRightMask   = 1 << UpRight,   // 00000010

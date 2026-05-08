@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <bitset>
+
 #include "direction.hpp"
 
 
@@ -14,6 +15,7 @@ class Field
 
 public:
     Field(int width, int height, int goalWidth);
+    //const Positions& positions();
 
 private:
     const std::uint8_t Visited = 1;
@@ -61,7 +63,7 @@ private:
     static int validated_height(int height);
     static int validated_goal_width(int goalWidth, int validWidth); //assumes already valid width!
 
-    void calculate_positions();
+    static Positions calculate_positions(int width, int height, int goalWidth, int verticesCount);
 
 
     void initialize_allowed();

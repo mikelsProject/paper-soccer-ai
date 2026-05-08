@@ -4,71 +4,69 @@ int Field::validated_width(int width)
 {
     if(width >= 5 && width % 2 == 1)
         return width;
-    else
-    {
-        std::cout << "width has to be an odd number, at least 5\n";
-        std::cout << "width was set to 9\n";
-        return 9;
-    }
+
+    std::cout << "width has to be an odd number, at least 5\n";
+    std::cout << "width was set to default 9\n";
+    return 9;
 }
 
 int Field::validated_height(int height)
 {
     if(height >= 3 && height % 2 == 1)
         return height;
-    else
-    {
-        std::cout << "height has to be an odd number, at least 3";
-        std::cout << "height was set to default 13";
-        return 13;
-    }
+
+    std::cout << "height has to be an odd number, at least 3";
+    std::cout << "height was set to default 13";
+    return 13;
 }
 
 int Field::validated_goal_width(int goalWidth, int validWidth)
 {
     if(goalWidth >= 3 && goalWidth <= validWidth - 2 && goalWidth % 2 == 1)
         return goalWidth;
-    else
-    {
-        std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field";
-        std::cout << "goal width was set to defualt 3";
-        return 3;
-    }
+    
+    std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field";
+    std::cout << "goal width was set to defualt 3";
+    return 3;
 }
 
-void Field::calculate_positions()
+Field::Positions Field::calculate_positions(int width, int height, int goalWidth, int verticesCount)
 {
+    Positions pos{};
     //beginning of upper goal (left side)
-    m_pos.upperGoalId = 0;
+    pos.upperGoalId = 0;
     //beginning of lower goal (left side)
-    m_pos.lowerGoalId = m_verticesCount - m_goalWidth; 
+    pos.lowerGoalId = verticesCount - goalWidth; 
     
     //field corners
-    m_pos.topLeftCorner = m_goalWidth;
-    m_pos.topRightCorner = m_goalWidth + m_width - 1;
-    m_pos.bottomLeftCorner = m_goalWidth + m_width * (m_height - 1);
-    m_pos.bottomRightCorner = m_goalWidth + m_width * m_height - 1;
+    pos.topLeftCorner = goalWidth;
+    pos.topRightCorner = goalWidth + width - 1;
+    pos.bottomLeftCorner = goalWidth + width * (height - 1);
+    pos.bottomRightCorner = goalWidth + width * height - 1;
 
     //goals posts
-    m_pos.topLeftGoalPost = m_goalWidth + (m_width - m_goalWidth) / 2;
-    m_pos.topRightGoalPost = m_pos.topLeftGoalPost + m_goalWidth - 1;
-    m_pos.bottomLeftGoalPost = m_pos.bottomLeftCorner + (m_width - m_goalWidth) / 2;
-    m_pos.bottomRightGoalPost = m_pos.bottomLeftGoalPost + m_goalWidth - 1;
+    pos.topLeftGoalPost = goalWidth + (width - goalWidth) / 2;
+    pos.topRightGoalPost = pos.topLeftGoalPost + goalWidth - 1;
+    pos.bottomLeftGoalPost = pos.bottomLeftCorner + (width - goalWidth) / 2;
+    pos.bottomRightGoalPost = pos.bottomLeftGoalPost + goalWidth - 1;
 
     //corners of the field part without borders
-    m_pos.insideTopLeftCorner = m_pos.topLeftCorner + m_width + 1;
-    m_pos.insideTopRightCorner = m_pos.topRightCorner + m_width - 1;
-    m_pos.insideBottomLeftCorner = m_pos.bottomLeftCorner - m_width + 1;
-    m_pos.insideBottomRightCorner = m_pos.bottomRightCorner - m_width - 1;
+    pos.insideTopLeftCorner = pos.topLeftCorner + width + 1;
+    pos.insideTopRightCorner = pos.topRightCorner + width - 1;
+    pos.insideBottomLeftCorner = pos.bottomLeftCorner - width + 1;
+    pos.insideBottomRightCorner = pos.bottomRightCorner - width - 1;
 
-    m_pos.fieldMiddle = (m_goalWidth - 1)/2 + m_width * (m_height + 1)/2;
+    pos.fieldMiddle = (goalWidth - 1)/2 + width * (height + 1)/2;
+
+    return pos;
 }
 
 Field::Field(int width, int height, int goalWidth)
     :m_width(validated_width(width)), 
      m_height(validated_height(height)),
      m_goalWidth(validated_goal_width(goalWidth, m_width)),
-     m_verticesCount(m_width * m_height + 2 * goalWidth)
+     m_verticesCount(m_width * m_height + 2 * goalWidth),
+     m_pos(calculate_positions(m_width, m_height, m_goalWidth, m_verticesCount))
 {
     initialize_allowed();
     initialize_visited();

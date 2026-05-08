@@ -41,7 +41,7 @@ void Field::calculate_positions()
     //beginning of upper goal (left side)
     m_pos.upperGoalId = 0;
     //beginning of lower goal (left side)
-    m_pos.lowerGoalId = m_verticesCount - (m_goalWidth - 1); 
+    m_pos.lowerGoalId = m_verticesCount - m_goalWidth; 
     
     //field corners
     m_pos.topLeftCorner = m_goalWidth;
@@ -62,7 +62,6 @@ void Field::calculate_positions()
     m_pos.insideBottomRightCorner = m_pos.bottomRightCorner - m_width - 1;
 
     m_pos.fieldMiddle = (m_goalWidth - 1)/2 + m_width * (m_height + 1)/2;
-
 }
 
 Field::Field(int width, int height, int goalWidth)
@@ -74,6 +73,7 @@ Field::Field(int width, int height, int goalWidth)
     initialize_allowed();
     initialize_visited();
 }
+
 
 void Field::initialize_allowed_vertical_borders()
 {
@@ -167,6 +167,7 @@ void Field::initialize_allowed()
     initialize_allowed_inside();
 }
 
+
 void Field::initialize_visited()
 {
     m_visited.assign(m_verticesCount, NotVisited);
@@ -231,7 +232,6 @@ void Field::fix_goal_area_neighbours()
     }
     m_neighbours[m_pos.bottomRightGoalPost][Direction::DownLeft] -= correction;
 }
-
 
 void Field::calculate_neighbours()
 {

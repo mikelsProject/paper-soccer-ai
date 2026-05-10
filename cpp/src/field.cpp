@@ -36,9 +36,9 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
 {
     Positions pos{};
     //beginning of upper goal (left side)
-    pos.upperGoalId = 0;
+    pos.topGoalId = 0;
     //beginning of lower goal (left side)
-    pos.lowerGoalId = verticesCount - goalWidth; 
+    pos.bottomGoalId = verticesCount - goalWidth; 
     
     //field corners
     pos.topLeftCorner = goalWidth;
@@ -190,7 +190,7 @@ void Field::initialize_allowed()
 {
     m_initialAllowedDirections.assign(m_verticesCount, Direction::None);
     
-    // Corners and score fields remain NONE intentionally.
+    // Corners and score fields remain set to Direction::None intentionally.
     // The code below only adds directions to playable border/interior fields.
 
     initialize_allowed_vertical_borders();
@@ -205,7 +205,7 @@ void Field::calculate_border()
     m_borderFlags.assign(m_verticesCount, false);
 
     //upper border with score area
-    for(VertexId id = m_pos.upperGoalId; id < m_pos.upperGoalId + m_goalWidth; ++id)
+    for(VertexId id = m_pos.topGoalId; id < m_pos.topGoalId + m_goalWidth; ++id)
         m_borderFlags[id] = true;
 
     for(VertexId id = m_pos.topLeftCorner; id <= m_pos.topLeftGoalPost; ++id)
@@ -223,7 +223,7 @@ void Field::calculate_border()
         m_borderFlags[id] = true;
 
     //lower border with score area
-    for(VertexId id = m_pos.lowerGoalId; id < m_pos.lowerGoalId + m_goalWidth; ++id)
+    for(VertexId id = m_pos.bottomGoalId; id < m_pos.bottomGoalId + m_goalWidth; ++id)
         m_borderFlags[id] = true;
 
     for(VertexId id = m_pos.bottomLeftCorner; id <= m_pos.bottomLeftGoalPost; ++id)

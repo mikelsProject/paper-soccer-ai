@@ -40,8 +40,8 @@ private:
 
     struct Positions
     {
-        VertexId upperGoalId;  //beginning of upper goal (left side)
-        VertexId lowerGoalId; //beginning of lower goal (left side)
+        VertexId topGoalId;  //beginning of upper goal (left side)
+        VertexId bottomGoalId; //beginning of lower goal (left side)
 
         VertexId topLeftCorner;
         VertexId topRightCorner; 

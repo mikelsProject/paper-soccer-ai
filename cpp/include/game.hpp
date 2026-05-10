@@ -11,6 +11,10 @@ class Game
 
 private:
     Field m_field;
+
+    AllowedDirections m_allowedDirections;
+    VertexFlags m_extraTurnVertices;
+    
     // what game needs to know - the full game state?
     // extraTurnVertices
     // allowedDirections
@@ -24,5 +28,4 @@ private:
     // 
     // no - neighbours is a geometry things, of exisitng edges, so
     // not stored in game, not modified
-    std::vector<std::uint8_t> m_allowed;
 };

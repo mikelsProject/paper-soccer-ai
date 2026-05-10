@@ -31,7 +31,7 @@ private:
     int m_goalWidth; // number of vertices of a goal, including posts
     int m_verticesCount;
 
-    AllowedDirections m_initialAllowed; //mask of directions in which we can still move from each vertex
+    AllowedDirections m_initialAllowedDirections; //mask of directions in which we can still move from each vertex
     
     VertexFlags m_borderFlags; //Flags on each vertices which are part of the border -> false - not border, true - border
 

@@ -35,9 +35,9 @@ int Field::validated_goal_width(int goalWidth, int validWidth)
 Field::Positions Field::calculate_positions(int width, int height, int goalWidth, int verticesCount)
 {
     Positions pos{};
-    //beginning of upper goal (left side)
+    //beginning of top goal (left side)
     pos.topGoalId = 0;
-    //beginning of lower goal (left side)
+    //beginning of bottom goal (left side)
     pos.bottomGoalId = verticesCount - goalWidth; 
     
     //field corners
@@ -123,7 +123,7 @@ void Field::initialize_allowed_vertical_borders()
 void Field::initialize_allowed_top_border()
 {
     namespace Dir = Direction;
-    //upper border without corners
+    //top border without corners
     
     for(VertexId id = m_pos.topLeftCorner + 1; id < m_pos.topLeftGoalPost; ++id)
         m_initialAllowedDirections[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
@@ -145,7 +145,7 @@ void Field::initialize_allowed_top_border()
 void Field::initialize_allowed_bottom_border()
 {
     namespace Dir = Direction;
-    //lower border without corners
+    //bottom border without corners
 
     for(VertexId id = m_pos.bottomLeftCorner + 1; id < m_pos.bottomLeftGoalPost; ++id)
         m_initialAllowedDirections[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
@@ -204,7 +204,7 @@ void Field::calculate_border()
 {
     m_borderFlags.assign(m_verticesCount, false);
 
-    //upper border with score area
+    //top border with score area
     for(VertexId id = m_pos.topGoalId; id < m_pos.topGoalId + m_goalWidth; ++id)
         m_borderFlags[id] = true;
 
@@ -222,7 +222,7 @@ void Field::calculate_border()
     for(VertexId id = m_pos.topRightCorner; id <= m_pos.bottomRightCorner; id += m_width)
         m_borderFlags[id] = true;
 
-    //lower border with score area
+    //bottom border with score area
     for(VertexId id = m_pos.bottomGoalId; id < m_pos.bottomGoalId + m_goalWidth; ++id)
         m_borderFlags[id] = true;
 

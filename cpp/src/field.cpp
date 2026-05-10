@@ -71,7 +71,7 @@ Field::Field(int width, int height, int goalWidth)
      m_verticesCount(m_width * m_height + 2 * goalWidth),
      m_pos(calculate_positions(m_width, m_height, m_goalWidth, m_verticesCount))
 {
-    initialize_allowed();
+    initialize_allowed_directions();
     calculate_border();
 }
 
@@ -108,7 +108,7 @@ bool Field::is_initial_direction_allowed(VertexId id , Direction::Index directio
 }
 
 
-void Field::initialize_allowed_vertical_borders()
+void Field::initialize_allowed_directions_vertical_borders()
 {
     namespace Dir = Direction;
     //left border without corners
@@ -120,7 +120,7 @@ void Field::initialize_allowed_vertical_borders()
         m_initialAllowedDirections[id] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask;
 }
 
-void Field::initialize_allowed_top_border()
+void Field::initialize_allowed_directions_top_border()
 {
     namespace Dir = Direction;
     //top border without corners
@@ -142,7 +142,7 @@ void Field::initialize_allowed_top_border()
     
 }
 
-void Field::initialize_allowed_bottom_border()
+void Field::initialize_allowed_directions_bottom_border()
 {
     namespace Dir = Direction;
     //bottom border without corners
@@ -164,7 +164,7 @@ void Field::initialize_allowed_bottom_border()
 
 }
 
-void Field::initialize_allowed_inside()
+void Field::initialize_allowed_directions_inside()
 {
     namespace Dir = Direction;
 
@@ -186,17 +186,17 @@ void Field::initialize_allowed_inside()
     m_initialAllowedDirections[m_pos.insideBottomRightCorner] &= ~Dir::DownRightMask;
 }
 
-void Field::initialize_allowed()
+void Field::initialize_allowed_directions()
 {
     m_initialAllowedDirections.assign(m_verticesCount, Direction::None);
     
     // Corners and score fields remain set to Direction::None intentionally.
     // The code below only adds directions to playable border/interior fields.
 
-    initialize_allowed_vertical_borders();
-    initialize_allowed_top_border();
-    initialize_allowed_bottom_border();
-    initialize_allowed_inside();
+    initialize_allowed_directions_vertical_borders();
+    initialize_allowed_directions_top_border();
+    initialize_allowed_directions_bottom_border();
+    initialize_allowed_directions_inside();
 }
 
 

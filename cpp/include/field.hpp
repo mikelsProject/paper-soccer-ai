@@ -69,11 +69,11 @@ private:
 
     static Positions calculate_positions(int width, int height, int goalWidth, int verticesCount);
 
-    void initialize_allowed();
-    void initialize_allowed_vertical_borders();
-    void initialize_allowed_top_border();
-    void initialize_allowed_bottom_border();
-    void initialize_allowed_inside();
+    void initialize_allowed_directions();
+    void initialize_allowed_directions_vertical_borders();
+    void initialize_allowed_directions_top_border();
+    void initialize_allowed_directions_bottom_border();
+    void initialize_allowed_directions_inside();
     
     void calculate_border();
     

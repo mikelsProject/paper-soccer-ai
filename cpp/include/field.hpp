@@ -8,54 +8,57 @@
 #include <bitset>
 
 #include "direction.hpp"
+#include "types.hpp"
 
 
 class Field
 {
-
 public:
     Field(int width, int height, int goalWidth);
-    //const Positions& positions();
+    //const Positions& positions() ? 
 
-private:
-    const std::uint8_t Border = 1;
-    const std::uint8_t NotBorder = 0; 
-    const int NoNeighbour = -1;
-    
+    int vertices_count() const;
+    const AllowedDirections& initial_allowed_directions() const;
+    const VertexFlags& border_flags() const;
+
+    VertexId neighbour_at(VertexId id, Direction::Index direction) const;
+    bool is_initial_direction_allowed(VertexId, Direction::Index direction) const;
+
+
 private:
     int m_width;     // number of vertices in x direction, NOT number of edges
     int m_height;    // number of vertices in y direction, NOT number of edges
     int m_goalWidth; // number of vertices of a goal, including posts
     int m_verticesCount;
 
-    std::vector<std::uint8_t> m_allowed; //mask of directions in which we can still move from each vertex
-    std::vector<std::uint8_t> m_border; //Verticies which are part of the border 0 - not border, 1 - border
-    std::vector<std::array<int, Direction::count>> m_neighbours; //look up table which return id of a vertex 
-                                                  //to which we will move if we apply a direction on a vertex
+    AllowedDirections m_initialAllowed; //mask of directions in which we can still move from each vertex
+    
+    VertexFlags m_borderFlags; //Flags on each vertices which are part of the border -> false - not border, true - border
 
-    std::vector<int> m_path; // TODO ? maybe this should be only in Game. 
+    Neighbours m_neighbours; //look up table which returns VertexId, usage: [VertexId][int] where int represents direction
+                                //to which we will move if we apply a direction on a vertex
 
     struct Positions
     {
-        int upperGoalId;  //beginning of upper goal (left side)
-        int lowerGoalId; //beginning of lower goal (left side)
+        VertexId upperGoalId;  //beginning of upper goal (left side)
+        VertexId lowerGoalId; //beginning of lower goal (left side)
 
-        int topLeftCorner;
-        int topRightCorner; 
-        int bottomLeftCorner; 
-        int bottomRightCorner;
+        VertexId topLeftCorner;
+        VertexId topRightCorner; 
+        VertexId bottomLeftCorner; 
+        VertexId bottomRightCorner;
 
-        int topLeftGoalPost;
-        int topRightGoalPost; 
-        int bottomLeftGoalPost; 
-        int bottomRightGoalPost;
+        VertexId topLeftGoalPost;
+        VertexId topRightGoalPost; 
+        VertexId bottomLeftGoalPost; 
+        VertexId bottomRightGoalPost;
 
-        int insideTopLeftCorner;
-        int insideTopRightCorner; 
-        int insideBottomLeftCorner; 
-        int insideBottomRightCorner;
+        VertexId insideTopLeftCorner;
+        VertexId insideTopRightCorner; 
+        VertexId insideBottomLeftCorner; 
+        VertexId insideBottomRightCorner;
 
-        int fieldMiddle;
+        VertexId fieldMiddle;
     };
     Positions m_pos;
 
@@ -66,20 +69,16 @@ private:
 
     static Positions calculate_positions(int width, int height, int goalWidth, int verticesCount);
 
-
     void initialize_allowed();
     void initialize_allowed_vertical_borders();
     void initialize_allowed_top_border();
     void initialize_allowed_bottom_border();
     void initialize_allowed_inside();
     
-    
-
     void calculate_border();
     
     void calculate_neighbours();
     void calculate_regular_neighbours();
     void fix_goal_area_neighbours();
-
 
 };

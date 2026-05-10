@@ -1,5 +1,7 @@
 #include "include/field.hpp"
 
+#include <cassert>
+
 int Field::validated_width(int width)
 {
     if(width >= 5 && width % 2 == 1)
@@ -61,6 +63,7 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
     return pos;
 }
 
+
 Field::Field(int width, int height, int goalWidth)
     :m_width(validated_width(width)), 
      m_height(validated_height(height)),
@@ -73,16 +76,48 @@ Field::Field(int width, int height, int goalWidth)
 }
 
 
+int Field::vertices_count() const
+{
+    return m_verticesCount;
+}
+
+const AllowedDirections& Field::initial_allowed_directions() const
+{
+    return m_initialAllowed;
+}
+
+const VertexFlags& Field::border_flags() const
+{
+    return m_borderFlags;
+}
+
+
+VertexId Field::neighbour_at(VertexId id, Direction::Index direction) const
+{
+    assert(id >= 0);
+    assert(id < m_verticesCount);
+    assert(static_cast<std::size_t>(direction) < Direction::Count);
+
+    return m_neighbours[id][direction];
+}
+
+bool Field::is_initial_direction_allowed(VertexId id , Direction::Index direction) const
+{
+    DirectionMask mask = Direction::mask_from_index(direction);
+    return (m_initialAllowed[id] & mask) != 0;
+}
+
+
 void Field::initialize_allowed_vertical_borders()
 {
     namespace Dir = Direction;
     //left border without corners
-    for(int id = m_pos.topLeftCorner + m_width; id <= m_pos.bottomLeftCorner - m_width; id += m_width)
-        m_allowed[id] |= Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
+    for(VertexId id = m_pos.topLeftCorner + m_width; id <= m_pos.bottomLeftCorner - m_width; id += m_width)
+        m_initialAllowed[id] |= Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
 
     //right border without corners
-    for(int id = m_pos.topRightCorner + m_width; id <= m_pos.bottomRightCorner - m_width; id += m_width)
-        m_allowed[id] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask;
+    for(VertexId id = m_pos.topRightCorner + m_width; id <= m_pos.bottomRightCorner - m_width; id += m_width)
+        m_initialAllowed[id] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask;
 }
 
 void Field::initialize_allowed_top_border()
@@ -90,20 +125,20 @@ void Field::initialize_allowed_top_border()
     namespace Dir = Direction;
     //upper border without corners
     
-    for(int id = m_pos.topLeftCorner + 1; id < m_pos.topLeftGoalPost; ++id)
-        m_allowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
+    for(VertexId id = m_pos.topLeftCorner + 1; id < m_pos.topLeftGoalPost; ++id)
+        m_initialAllowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
     
         //goal area
-    m_allowed[m_pos.topLeftGoalPost] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask | Dir::RightMask | Dir::UpRightMask;
+    m_initialAllowed[m_pos.topLeftGoalPost] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask | Dir::RightMask | Dir::UpRightMask;
 
-    for(int id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
-        m_allowed[id] |= Dir::All;
+    for(VertexId id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
+        m_initialAllowed[id] |= Dir::All;
 
-    m_allowed[m_pos.topRightGoalPost] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
+    m_initialAllowed[m_pos.topRightGoalPost] |= Dir::UpLeftMask | Dir::LeftMask | Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
         //
 
-    for(int id = m_pos.topRightGoalPost + 1; id < m_pos.topRightCorner; ++id)
-        m_allowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
+    for(VertexId id = m_pos.topRightGoalPost + 1; id < m_pos.topRightCorner; ++id)
+        m_initialAllowed[id] |= Dir::DownLeftMask | Dir::DownMask | Dir::DownRightMask;
     
 }
 
@@ -112,20 +147,20 @@ void Field::initialize_allowed_bottom_border()
     namespace Dir = Direction;
     //lower border without corners
 
-    for(int id = m_pos.bottomLeftCorner + 1; id < m_pos.bottomLeftGoalPost; ++id)
-        m_allowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
+    for(VertexId id = m_pos.bottomLeftCorner + 1; id < m_pos.bottomLeftGoalPost; ++id)
+        m_initialAllowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
     
         //goal area
-    m_allowed[m_pos.bottomLeftGoalPost] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
+    m_initialAllowed[m_pos.bottomLeftGoalPost] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask | Dir::RightMask | Dir::DownRightMask;
 
-    for(int id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
-        m_allowed[id] |= Dir::All;
+    for(VertexId id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
+        m_initialAllowed[id] |= Dir::All;
 
-    m_allowed[m_pos.bottomRightGoalPost] |= Dir::DownLeftMask | Dir::LeftMask | Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
+    m_initialAllowed[m_pos.bottomRightGoalPost] |= Dir::DownLeftMask | Dir::LeftMask | Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
         //
 
-    for(int id = m_pos.bottomRightGoalPost + 1; id <= m_pos.bottomRightCorner - 1; ++id)
-        m_allowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
+    for(VertexId id = m_pos.bottomRightGoalPost + 1; id <= m_pos.bottomRightCorner - 1; ++id)
+        m_initialAllowed[id] |= Dir::UpLeftMask | Dir::UpMask | Dir::UpRightMask;
 
 }
 
@@ -140,21 +175,20 @@ void Field::initialize_allowed_inside()
     {
         for(int localX = 0; localX < insideWidth; ++localX)
         {
-            m_allowed[m_pos.insideTopLeftCorner + localX + m_width * localY] = Dir::All;
+            m_initialAllowed[m_pos.insideTopLeftCorner + localX + m_width * localY] = Dir::All;
         }
     }
     
         //but corners of the field are not allowed to be moved into
-    m_allowed[m_pos.insideTopLeftCorner] &= ~Dir::UpLeftMask;
-    m_allowed[m_pos.insideTopRightCorner] &= ~Dir::UpRightMask;
-    m_allowed[m_pos.insideBottomLeftCorner] &= ~Dir::DownLeftMask;
-    m_allowed[m_pos.insideBottomRightCorner] &= ~Dir::DownRightMask;
+    m_initialAllowed[m_pos.insideTopLeftCorner] &= ~Dir::UpLeftMask;
+    m_initialAllowed[m_pos.insideTopRightCorner] &= ~Dir::UpRightMask;
+    m_initialAllowed[m_pos.insideBottomLeftCorner] &= ~Dir::DownLeftMask;
+    m_initialAllowed[m_pos.insideBottomRightCorner] &= ~Dir::DownRightMask;
 }
 
 void Field::initialize_allowed()
 {
-    namespace Dir = Direction;
-    m_allowed.assign(m_verticesCount, Dir::None);
+    m_initialAllowed.assign(m_verticesCount, Direction::None);
     
     // Corners and score fields remain NONE intentionally.
     // The code below only adds directions to playable border/interior fields.
@@ -168,44 +202,41 @@ void Field::initialize_allowed()
 
 void Field::calculate_border()
 {
-    const std::uint8_t Border = 1;
-    const std::uint8_t NotBorder = 0;
-    m_border.assign(m_verticesCount, NotBorder);
-    m_border[m_pos.fieldMiddle] = Border;   
+    m_borderFlags.assign(m_verticesCount, false);
 
-    //upper border without score area
-    for(int id = m_pos.upperGoalId; id < m_pos.upperGoalId + m_goalWidth; ++id)
-        m_border[id] = Border;
+    //upper border with score area
+    for(VertexId id = m_pos.upperGoalId; id < m_pos.upperGoalId + m_goalWidth; ++id)
+        m_borderFlags[id] = true;
 
-    for(int id = m_pos.topLeftCorner; id <= m_pos.topLeftGoalPost; ++id)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.topLeftCorner; id <= m_pos.topLeftGoalPost; ++id)
+        m_borderFlags[id] = true;
     
-    for(int id = m_pos.topRightGoalPost; id <= m_pos.topRightCorner; ++id)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.topRightGoalPost; id <= m_pos.topRightCorner; ++id)
+        m_borderFlags[id] = true;
     
     //left border
-    for(int id = m_pos.topLeftCorner; id <= m_pos.bottomLeftCorner; id += m_width)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.topLeftCorner; id <= m_pos.bottomLeftCorner; id += m_width)
+        m_borderFlags[id] = true;
 
     //right border
-    for(int id = m_pos.topRightCorner; id <= m_pos.bottomRightCorner; id += m_width)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.topRightCorner; id <= m_pos.bottomRightCorner; id += m_width)
+        m_borderFlags[id] = true;
 
     //lower border with score area
-    for(int id = m_pos.lowerGoalId; id < m_pos.lowerGoalId + m_goalWidth; ++id)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.lowerGoalId; id < m_pos.lowerGoalId + m_goalWidth; ++id)
+        m_borderFlags[id] = true;
 
-    for(int id = m_pos.bottomLeftCorner; id <= m_pos.bottomLeftGoalPost; ++id)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.bottomLeftCorner; id <= m_pos.bottomLeftGoalPost; ++id)
+        m_borderFlags[id] = true;
 
-    for(int id = m_pos.bottomRightGoalPost; id <= m_pos.bottomRightCorner; ++id)
-        m_border[id] = Border;
+    for(VertexId id = m_pos.bottomRightGoalPost; id <= m_pos.bottomRightCorner; ++id)
+        m_borderFlags[id] = true;
 }
 
 
 void Field::calculate_regular_neighbours()
 {
-    const std::array<int, Direction::count> directionOffset = 
+    const std::array<int, Direction::Count> directionOffset = 
     { 
         -m_width,      // 0 -> Up
         -m_width + 1,  // 1 -> UpRight
@@ -217,21 +248,14 @@ void Field::calculate_regular_neighbours()
         -m_width - 1   // 7 -> UpLeft
     };
 
-    for(int id = 0; id < m_verticesCount; ++id)
+    for(VertexId id = 0; id < m_verticesCount; ++id)
     {   
-        for(int direction = 0; direction < Direction::count; ++direction)
+        for(Direction::Index direction : Direction::Indices)
         {
-            //is the bit for current direction set to 1 (allowed)
-            bool directionAllowed = m_allowed[id] & (1u << direction) != 0;
-
-            if(directionAllowed)
-            {
+            if(is_initial_direction_allowed(id, direction))
                 m_neighbours[id][direction] =  id + directionOffset[direction];
-            }
             else
-            {
                 m_neighbours[id][direction] = NoNeighbour;
-            }
         }      
     }
 }
@@ -242,7 +266,7 @@ void Field::fix_goal_area_neighbours()
     
     //top are near goal
     m_neighbours[m_pos.topLeftGoalPost][Direction::UpRight] += correction;
-    for(int id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
+    for(VertexId id = m_pos.topLeftGoalPost + 1; id < m_pos.topRightGoalPost; ++id)
     {  
         m_neighbours[id][Direction::Up] += correction;
         m_neighbours[id][Direction::UpRight] += correction;
@@ -252,7 +276,7 @@ void Field::fix_goal_area_neighbours()
 
     //bottom area near goal
     m_neighbours[m_pos.bottomLeftGoalPost][Direction::DownRight] -= correction;
-    for(int id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
+    for(VertexId id = m_pos.bottomLeftGoalPost + 1; id < m_pos.bottomRightGoalPost; ++id)
     {
         m_neighbours[id][Direction::DownLeft] -= correction;
         m_neighbours[id][Direction::Down] -= correction;

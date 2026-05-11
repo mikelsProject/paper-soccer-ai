@@ -17,9 +17,19 @@ public:
     Field(int width, int height, int goalWidth);
     //const Positions& positions() ? 
 
+    int width() const;
+    int height() const;
+    int goal_width() const;
     int vertices_count() const;
     const AllowedDirections& initial_allowed_directions() const;
     const VertexFlags& border_flags() const;
+    VertexId middle_vertex() const;
+    VertexId top_goal_vertex() const; //returns first (left) vertex of top goal
+    VertexId bottom_goal_vertex() const; //returns first (left) vertex of bottomS goal
+    VertexId top_left_corner() const;
+    VertexId top_right_corner() const;
+    VertexId bottom_left_corner() const;
+    VertexId bottom_right_corner() const;
 
     VertexId neighbour_at(VertexId id, Direction::Index direction) const;
     bool is_initial_direction_allowed(VertexId, Direction::Index direction) const;

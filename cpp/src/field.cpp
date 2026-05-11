@@ -75,6 +75,20 @@ Field::Field(int width, int height, int goalWidth)
     calculate_border();
 }
 
+int Field::width() const
+{
+    return m_width;
+}
+
+int Field::height() const
+{
+    return m_height;
+}
+
+int Field::goal_width() const
+{
+    return m_goalWidth;
+}
 
 int Field::vertices_count() const
 {
@@ -91,6 +105,40 @@ const VertexFlags& Field::border_flags() const
     return m_borderFlags;
 }
 
+VertexId Field::middle_vertex() const
+{
+    return m_pos.fieldMiddle;
+}
+
+VertexId Field::top_goal_vertex() const
+{
+    return m_pos.topGoalId;
+}
+
+VertexId Field::bottom_goal_vertex() const
+{
+    return m_pos.bottomGoalId;
+}
+
+VertexId Field::top_left_corner() const
+{
+    return m_pos.topLeftCorner;
+}
+
+VertexId Field::top_right_corner() const
+{
+    return m_pos.topRightCorner;
+}
+
+VertexId Field::bottom_left_corner() const
+{
+    return m_pos.bottomLeftCorner;
+}
+
+VertexId Field::bottom_right_corner() const
+{
+    return m_pos.bottomRightCorner;
+}
 
 VertexId Field::neighbour_at(VertexId id, Direction::Index direction) const
 {

@@ -140,7 +140,7 @@ VertexId Field::bottom_right_corner() const
     return m_pos.bottomRightCorner;
 }
 
-VertexId Field::neighbour_at(VertexId id, Direction::Index direction) const
+VertexId Field::neighbour_at(VertexId id, Direction::Value direction) const
 {
     assert(id >= 0);
     assert(id < m_verticesCount);
@@ -149,9 +149,9 @@ VertexId Field::neighbour_at(VertexId id, Direction::Index direction) const
     return m_neighbours[id][direction];
 }
 
-bool Field::is_initial_direction_allowed(VertexId id , Direction::Index direction) const
+bool Field::is_initial_direction_allowed(VertexId id , Direction::Value direction) const
 {
-    DirectionMask mask = Direction::mask_from_index(direction);
+    DirectionMask mask = Direction::mask_from_value(direction);
     return (m_initialAllowedDirections[id] & mask) != 0;
 }
 
@@ -298,7 +298,7 @@ void Field::calculate_regular_neighbours()
 
     for(VertexId id = 0; id < m_verticesCount; ++id)
     {   
-        for(Direction::Index direction : Direction::Indices)
+        for(Direction::Value direction : Direction::Values)
         {
             if(is_initial_direction_allowed(id, direction))
                 m_neighbours[id][direction] =  id + directionOffset[direction];

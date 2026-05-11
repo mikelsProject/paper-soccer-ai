@@ -28,7 +28,14 @@ void Game::initialize_extra_turn_vertices()
 
 Game::Game(int width, int height, int goalWidth)
     :m_field(width, height, goalWidth),
-     m_allowedDirections(m_field.initial_allowed_directions())
+     m_allowedDirections(m_field.initial_allowed_directions()),
+     m_playerToMove(Player::Top),
+     m_boalPosition(m_field.middle_vertex())
 {
     initialize_extra_turn_vertices();
+}
+
+void Game::make_move(Direction::Value Direction)
+{
+    
 }

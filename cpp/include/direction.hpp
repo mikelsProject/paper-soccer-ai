@@ -6,7 +6,7 @@ namespace Direction
 {
     inline constexpr std::size_t Count = 8;
 
-    enum Index : std::int8_t
+    enum Value : std::int8_t
     {
         Up        = 0,
         UpRight   = 1,
@@ -18,7 +18,7 @@ namespace Direction
         UpLeft    = 7
     };
 
-    inline constexpr std::array<Index, Count> Indices
+    inline constexpr std::array<Value, Count> Values
     {
         Up, 
         UpRight,
@@ -44,8 +44,8 @@ namespace Direction
         All        = 0xFF                   // 11111111
     };
 
-    constexpr Mask mask_from_index(Index dir)
+    constexpr Mask mask_from_value(Value direction)
     {
-        return static_cast<Mask>(1u << dir);
+        return static_cast<Mask>(1u << direction);
     }
 }

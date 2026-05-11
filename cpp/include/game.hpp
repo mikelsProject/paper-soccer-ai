@@ -15,8 +15,8 @@ class Game
     // move, reset, cancel a move, win detection, loss detection
     // what about GUI? some renderer? SFML?
     // do we to it externally from the game?
-    
 
+    void make_move(Direction::Value direction);
 
 
     enum class Player : std::uint8_t

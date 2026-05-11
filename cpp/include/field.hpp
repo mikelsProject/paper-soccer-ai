@@ -31,8 +31,8 @@ public:
     VertexId bottom_left_corner() const;
     VertexId bottom_right_corner() const;
 
-    VertexId neighbour_at(VertexId id, Direction::Index direction) const;
-    bool is_initial_direction_allowed(VertexId, Direction::Index direction) const;
+    VertexId neighbour_at(VertexId id, Direction::Value direction) const;
+    bool is_initial_direction_allowed(VertexId, Direction::Value direction) const;
 
 
 private:

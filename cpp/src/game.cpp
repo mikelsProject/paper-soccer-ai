@@ -44,5 +44,6 @@ void Game::make_move(Direction::Value Direction)
     // modify extra turn vertices
     // modify allowed directions, removing the used edge from both
     // vertices of allowedDirection
-    
+
+    // game_class branch test
 }

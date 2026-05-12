@@ -37,5 +37,12 @@ Game::Game(int width, int height, int goalWidth)
 
 void Game::make_move(Direction::Value Direction)
 {
+    // check if move is legal now - using allowed
+    // make the move - update ballPosition
+    // add move to path
+    // based on extraTurn vertices change the current player (or not)
+    // modify extra turn vertices
+    // modify allowed directions, removing the used edge from both
+    // vertices of allowedDirection
     
 }

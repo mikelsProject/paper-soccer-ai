@@ -47,6 +47,41 @@ void Game::reset_board()
     initialize_extra_turn_vertices();
 }
 
+Game::Player Game::player_to_move() const
+{
+    return m_playerToMove;
+}
+
+VertexId Game::ball_position() const
+{
+    return m_ballPosition;
+}
+
+bool Game::is_game_over() const
+{
+    return m_gameOver;
+}
+
+std::optional<Game::Player> Game::winner() const
+{
+    return m_winner;
+}
+
+int Game::vertices_count() const
+{
+    return m_field.vertices_count();
+}
+
+bool Game::is_direction_allowed(VertexId vertex, Direction::Value direction) const
+{
+    return Direction::contains(m_allowedDirections[vertex], direction);
+}
+
+bool Game::is_extra_turn_vertex(VertexId vertex) const
+{
+    return m_extraTurnVertices[vertex];
+}
+
 bool Game::is_dead_end(VertexId vertex) const
 {
     return m_allowedDirections[vertex] == Direction::None;
@@ -78,34 +113,53 @@ void Game::remove_allowed_direction(VertexId vertex, Direction::Value direction)
 
 Game::MoveResult Game::make_move(Direction::Value direction)
 {
-    if(m_gameOver)
-        return { false, true, m_winner};
+    constexpr bool MoveMade = true;
+    constexpr bool MoveNotMade = false;
 
-    if(is_dead_end(m_ballPosition))
-         return { false, true, other_player(m_playerToMove)};
-    
-    if(!is_move_legal(direction))
-        return { false, m_gameOver, m_winner };
+    if(m_gameOver)
+        return { MoveNotMade, m_gameOver, m_winner};
+
+    if( is_dead_end(m_ballPosition))
+    {   
+        m_gameOver = true;
+        m_winner = other_player(m_playerToMove);
+        return { MoveNotMade, m_gameOver, m_winner };
+    }
+
+    if( !is_move_legal(direction))
+        return { MoveNotMade, m_gameOver, m_winner };
     
     const VertexId from = m_ballPosition;
     const VertexId to = m_field.neighbour_at(from, direction);
 
     remove_allowed_direction(from, direction);
-    remove_allowed_direction(to, direction);
+    remove_allowed_direction(to, Direction::opposite(direction));
 
     m_ballPosition = to;
-
     m_path.push_back(m_ballPosition);
+    
+    m_winner = check_for_winner(m_ballPosition);
+    if(m_winner.has_value())
+    {
+        m_gameOver = true;
+        return {MoveMade, m_gameOver, m_winner};
+    }
+
+    // If a player moves the ball into a dead end - that player loses
+    // Therefore this check must happen before switching m_playerToMove
+    if(is_dead_end(m_ballPosition))
+    {
+        m_gameOver = true;
+        m_winner = other_player(m_playerToMove);
+
+        return { MoveMade, m_gameOver, m_winner };
+    }
 
     if(!m_extraTurnVertices[m_ballPosition])
         m_playerToMove = other_player(m_playerToMove);
 
     m_extraTurnVertices[m_ballPosition] = true;
 
-    m_winner = check_for_winner(m_ballPosition);
 
-    if(m_winner != std::nullopt)
-        m_gameOver = true;
-
-    return {true, m_gameOver, m_winner};
+    return {MoveMade, m_gameOver, m_winner};
 }

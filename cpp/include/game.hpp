@@ -12,12 +12,6 @@ class Game
 public:
     Game(int width, int height, int goalWidth);
 
-    // What API functions do we need? ... 
-    // What needs to be public and what can be private?
-    // move, reset, cancel a move, win detection, loss detection
-    // what about GUI? some renderer? SFML?
-    // do we to it externally from the game?
-
     enum class Player : std::uint8_t
     {
         Top = 0,
@@ -34,6 +28,16 @@ public:
     void reset_board();
     MoveResult make_move(Direction::Value direction);
     
+    Player player_to_move() const;
+    VertexId ball_position() const;
+    bool is_game_over() const;
+    std::optional<Player> winner() const;
+
+    int vertices_count() const;
+
+    bool is_direction_allowed(VertexId vertex, Direction::Value direction) const;
+    bool is_extra_turn_vertex(VertexId vertex) const;
+
 
 private:
     Field m_field;

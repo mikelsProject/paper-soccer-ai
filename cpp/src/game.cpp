@@ -28,6 +28,8 @@ void Game::initialize_extra_turn_vertices()
 
 Game::Game(int width, int height, int goalWidth)
     :m_field(width, height, goalWidth),
+     m_gameOver(false),
+     m_winner(std::nullopt),
      m_allowedDirections(m_field.initial_allowed_directions()),
      m_playerToMove(Player::Top),
      m_ballPosition(m_field.middle_vertex())
@@ -37,15 +39,35 @@ Game::Game(int width, int height, int goalWidth)
 
 void Game::reset_board()
 {
+    m_gameOver = false;
+    m_winner = std::nullopt;
     m_allowedDirections = m_field.initial_allowed_directions();
     m_playerToMove = Player::Top;
     m_ballPosition = m_field.middle_vertex();
     initialize_extra_turn_vertices();
 }
 
-bool Game::is_move_legal(Direction::Value direction)
+bool Game::is_dead_end(VertexId vertex) const
+{
+    return m_allowedDirections[vertex] == Direction::None;
+}
+
+bool Game::is_move_legal(Direction::Value direction) const
 {
     return Direction::contains(m_allowedDirections[m_ballPosition], direction);
+}
+
+std::optional<Game::Player> Game::check_for_winner(VertexId vertex) const
+{
+    // top goal reached, bottom player won
+    if (vertex < m_field.top_goal_vertex() + m_field.goal_width())
+        return Player::Bottom;
+    
+    // bottom goal reached, top player won
+    if (vertex >= m_field.bottom_goal_vertex())
+        return Player::Top;
+
+    return std::nullopt;
 }
 
 void Game::remove_allowed_direction(VertexId vertex, Direction::Value direction)
@@ -54,10 +76,16 @@ void Game::remove_allowed_direction(VertexId vertex, Direction::Value direction)
 }
 
 
-bool Game::make_move(Direction::Value direction)
+Game::MoveResult Game::make_move(Direction::Value direction)
 {
+    if(m_gameOver)
+        return { false, true, m_winner};
+
+    if(is_dead_end(m_ballPosition))
+         return { false, true, other_player(m_playerToMove)};
+    
     if(!is_move_legal(direction))
-        return false;
+        return { false, m_gameOver, m_winner };
     
     const VertexId from = m_ballPosition;
     const VertexId to = m_field.neighbour_at(from, direction);
@@ -73,4 +101,11 @@ bool Game::make_move(Direction::Value direction)
         m_playerToMove = other_player(m_playerToMove);
 
     m_extraTurnVertices[m_ballPosition] = true;
+
+    m_winner = check_for_winner(m_ballPosition);
+
+    if(m_winner != std::nullopt)
+        m_gameOver = true;
+
+    return {true, m_gameOver, m_winner};
 }

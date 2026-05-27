@@ -16,8 +16,8 @@ class Game
     // what about GUI? some renderer? SFML?
     // do we to it externally from the game?
 
+    void reset_board();
     bool make_move(Direction::Value direction);
-
 
     enum class Player : std::uint8_t
     {

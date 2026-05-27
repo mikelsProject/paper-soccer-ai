@@ -35,6 +35,14 @@ Game::Game(int width, int height, int goalWidth)
     initialize_extra_turn_vertices();
 }
 
+void Game::reset_board()
+{
+    m_allowedDirections = m_field.initial_allowed_directions();
+    m_playerToMove = Player::Top;
+    m_ballPosition = m_field.middle_vertex();
+    initialize_extra_turn_vertices();
+}
+
 bool Game::is_move_legal(Direction::Value direction)
 {
     return Direction::contains(m_allowedDirections[m_ballPosition], direction);

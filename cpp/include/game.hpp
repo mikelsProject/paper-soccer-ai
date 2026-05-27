@@ -16,7 +16,7 @@ class Game
     // what about GUI? some renderer? SFML?
     // do we to it externally from the game?
 
-    void make_move(Direction::Value direction);
+    bool make_move(Direction::Value direction);
 
 
     enum class Player : std::uint8_t
@@ -30,10 +30,17 @@ private:
 
     AllowedDirections m_allowedDirections;
     VertexFlags m_extraTurnVertices;
-    VertexId m_boalPosition;
+    VertexId m_ballPosition;
     Player m_playerToMove;
     std::vector<VertexId> m_path;
 
 private:
     void initialize_extra_turn_vertices();
+    bool is_move_legal(Direction::Value direction);
+    void remove_allowed_direction(VertexId vertex, Direction::Value direciton);
+
+    static constexpr Player other_player(Player player)
+    {
+        return player == Player::Top ? Player::Bottom : Player::Top;
+    }
 };

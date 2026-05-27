@@ -151,8 +151,7 @@ VertexId Field::neighbour_at(VertexId id, Direction::Value direction) const
 
 bool Field::is_initial_direction_allowed(VertexId id , Direction::Value direction) const
 {
-    DirectionMask mask = Direction::mask_from_value(direction);
-    return (m_initialAllowedDirections[id] & mask) != 0;
+    return Direction::contains(m_initialAllowedDirections[id], direction);
 }
 
 

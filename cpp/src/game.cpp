@@ -30,20 +30,39 @@ Game::Game(int width, int height, int goalWidth)
     :m_field(width, height, goalWidth),
      m_allowedDirections(m_field.initial_allowed_directions()),
      m_playerToMove(Player::Top),
-     m_boalPosition(m_field.middle_vertex())
+     m_ballPosition(m_field.middle_vertex())
 {
     initialize_extra_turn_vertices();
 }
 
-void Game::make_move(Direction::Value Direction)
+bool Game::is_move_legal(Direction::Value direction)
 {
-    // check if move is legal now - using allowed
-    // make the move - update ballPosition
-    // add move to path
-    // based on extraTurn vertices change the current player (or not)
-    // modify extra turn vertices
-    // modify allowed directions, removing the used edge from both
-    // vertices of allowedDirection
+    return Direction::contains(m_allowedDirections[m_ballPosition], direction);
+}
 
-    // game_class branch test
+void Game::remove_allowed_direction(VertexId vertex, Direction::Value direction)
+{
+    Direction::disable(m_allowedDirections[vertex], direction);
+}
+
+
+bool Game::make_move(Direction::Value direction)
+{
+    if(!is_move_legal(direction))
+        return false;
+    
+    const VertexId from = m_ballPosition;
+    const VertexId to = m_field.neighbour_at(from, direction);
+
+    remove_allowed_direction(from, direction);
+    remove_allowed_direction(to, direction);
+
+    m_ballPosition = to;
+
+    m_path.push_back(m_ballPosition);
+
+    if(!m_extraTurnVertices[m_ballPosition])
+        m_playerToMove = other_player(m_playerToMove);
+
+    m_extraTurnVertices[m_ballPosition] = true;
 }

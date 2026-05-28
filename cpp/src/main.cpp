@@ -76,10 +76,9 @@ int main()
 {
     int width =  11;
     int height = 13;
-    int goalWidth = 5;
+    int goalWidth = 3;
 
     Game soccer(width, height, goalWidth);
-
     int move;
     do
     {

@@ -17,8 +17,8 @@ int Field::validated_height(int height)
     if(height >= 3 && height % 2 == 1)
         return height;
 
-    std::cout << "height has to be an odd number, at least 3";
-    std::cout << "height was set to default 13";
+    std::cout << "height has to be an odd number, at least 3\n";
+    std::cout << "height was set to default 13\n";
     return 13;
 }
 
@@ -27,8 +27,8 @@ int Field::validated_goal_width(int goalWidth, int validWidth)
     if(goalWidth >= 3 && goalWidth <= validWidth - 2 && goalWidth % 2 == 1)
         return goalWidth;
     
-    std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field";
-    std::cout << "goal width was set to defualt 3";
+    std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field\n";
+    std::cout << "goal width was set to defualt 3\n";
     return 3;
 }
 
@@ -59,7 +59,7 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
     pos.insideBottomRightCorner = pos.bottomRightCorner - width - 1;
 
     pos.fieldMiddle = goalWidth + width * (height/2) + width/2;
-    
+
     return pos;
 }
 

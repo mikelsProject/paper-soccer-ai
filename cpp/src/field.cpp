@@ -1,4 +1,4 @@
-#include "include/field.hpp"
+#include "field.hpp"
 
 #include <cassert>
 
@@ -17,8 +17,8 @@ int Field::validated_height(int height)
     if(height >= 3 && height % 2 == 1)
         return height;
 
-    std::cout << "height has to be an odd number, at least 3";
-    std::cout << "height was set to default 13";
+    std::cout << "height has to be an odd number, at least 3\n";
+    std::cout << "height was set to default 13\n";
     return 13;
 }
 
@@ -27,8 +27,8 @@ int Field::validated_goal_width(int goalWidth, int validWidth)
     if(goalWidth >= 3 && goalWidth <= validWidth - 2 && goalWidth % 2 == 1)
         return goalWidth;
     
-    std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field";
-    std::cout << "goal width was set to defualt 3";
+    std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field\n";
+    std::cout << "goal width was set to defualt 3\n";
     return 3;
 }
 
@@ -58,7 +58,7 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
     pos.insideBottomLeftCorner = pos.bottomLeftCorner - width + 1;
     pos.insideBottomRightCorner = pos.bottomRightCorner - width - 1;
 
-    pos.fieldMiddle = (goalWidth - 1)/2 + width * (height + 1)/2;
+    pos.fieldMiddle = goalWidth + width * (height/2) + width/2;
 
     return pos;
 }
@@ -73,6 +73,7 @@ Field::Field(int width, int height, int goalWidth)
 {
     initialize_allowed_directions();
     calculate_border();
+    calculate_neighbours();
 }
 
 int Field::width() const
@@ -151,8 +152,7 @@ VertexId Field::neighbour_at(VertexId id, Direction::Value direction) const
 
 bool Field::is_initial_direction_allowed(VertexId id , Direction::Value direction) const
 {
-    DirectionMask mask = Direction::mask_from_value(direction);
-    return (m_initialAllowedDirections[id] & mask) != 0;
+    return Direction::contains(m_initialAllowedDirections[id], direction);
 }
 
 
@@ -335,8 +335,9 @@ void Field::fix_goal_area_neighbours()
 
 void Field::calculate_neighbours()
 {
+    m_neighbours.assign(m_verticesCount, {});
     calculate_regular_neighbours();
-    
+ 
     // Fix neighbours that point into score fields.
     // Normal +/- m_width offsets do not work there 
     // because score rows have m_goalWidth vertices, not m_width vertices

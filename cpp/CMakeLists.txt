@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(soccer
     src/field.cpp
     src/game.cpp
+    # src/paper_soccer_env.cpp
     src/main.cpp
 )
 

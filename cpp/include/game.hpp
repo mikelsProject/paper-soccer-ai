@@ -47,6 +47,17 @@ public:
     bool is_direction_allowed(VertexId vertex, Direction::Value direction) const;
     bool is_extra_turn_vertex(VertexId vertex) const;
 
+    bool was_visited(int id) const
+    {
+        for(int i = 0; i < m_path.size(); ++i)
+        {
+            int visited = m_path[i].from;
+            if(visited == id)
+                return true;
+        }
+        return false;
+    }
+
 
 private:
     Field m_field;

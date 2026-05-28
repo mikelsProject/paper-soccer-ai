@@ -118,7 +118,7 @@ void Game::save_game_state() const
         state << "0 ";
     state << "1 ";
     for(int i = m_ballPosition + 1; i < vertices_count(); ++i)
-        state << "1 ";
+        state << "0 ";
     state << "\n";
 
     //allowed direction

@@ -68,7 +68,7 @@ Direction::Value move_from_keyboard_num(int move)
         case 7: 
             return Direction::UpLeft;
         default:
-            return static_cast<Direction::Value>(0);
+            return static_cast<Direction::Value>(-1);
     }
 }
 
@@ -76,7 +76,7 @@ int main()
 {
     int width =  11;
     int height = 13;
-    int goalWidth = 3;
+    int goalWidth = 5;
 
     Game soccer(width, height, goalWidth);
     int move;

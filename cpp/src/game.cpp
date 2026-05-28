@@ -73,6 +73,21 @@ int Game::vertices_count() const
     return m_field.vertices_count();
 }
 
+int Game::width() const
+{
+    return m_field.width();
+}
+
+int Game::height() const
+{
+    return m_field.height();
+}
+
+int Game::goalWidth() const
+{
+    return m_field.goal_width();
+}
+
 bool Game::is_direction_allowed(VertexId vertex, Direction::Value direction) const
 {
     return Direction::contains(m_allowedDirections[vertex], direction);

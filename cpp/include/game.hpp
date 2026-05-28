@@ -43,6 +43,9 @@ public:
     std::optional<Player> winner() const;
 
     int vertices_count() const;
+    int width() const;
+    int height() const;
+    int goalWidth() const;
 
     bool is_direction_allowed(VertexId vertex, Direction::Value direction) const;
     bool is_extra_turn_vertex(VertexId vertex) const;

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <optional>
+#include <fstream>
 
 #include "direction.hpp"
 #include "field.hpp"
@@ -23,6 +24,14 @@ public:
         bool moved;
         bool gameOver;
         std::optional<Player> winner;
+    };
+
+    struct MoveRecord
+    {
+        VertexId from;
+        VertexId to;
+        Direction::Value direction;
+        Player player;
     };
 
     void reset_board();
@@ -51,7 +60,7 @@ private:
     Player m_playerToMove;
     std::optional<Player> m_winner;
 
-    std::vector<VertexId> m_path;
+    std::vector<MoveRecord> m_path;
 
 private:
     void initialize_extra_turn_vertices();
@@ -59,6 +68,7 @@ private:
     bool is_dead_end(VertexId vertex) const;
     bool is_move_legal(Direction::Value direction) const;
     std::optional<Player> check_for_winner(VertexId vertex) const;
+    void save_game_state() const;
 
     static constexpr Player other_player(Player player) {   return player == Player::Top ? Player::Bottom : Player::Top;    }
 

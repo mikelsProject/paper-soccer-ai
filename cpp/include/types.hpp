@@ -17,3 +17,5 @@ using AllowedDirections = std::vector<Direction::Mask>;
 
 using VertexFlag = std::uint8_t;
 using VertexFlags = std::vector<VertexFlag>;
+
+#define Log(x) std::cout << #x << ": " << x << std::endl 

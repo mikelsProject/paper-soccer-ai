@@ -1,4 +1,4 @@
-#include "include/field.hpp"
+#include "field.hpp"
 
 #include <cassert>
 
@@ -58,8 +58,8 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
     pos.insideBottomLeftCorner = pos.bottomLeftCorner - width + 1;
     pos.insideBottomRightCorner = pos.bottomRightCorner - width - 1;
 
-    pos.fieldMiddle = (goalWidth - 1)/2 + width * (height + 1)/2;
-
+    pos.fieldMiddle = goalWidth + width * (height/2) + width/2;
+    
     return pos;
 }
 
@@ -73,6 +73,7 @@ Field::Field(int width, int height, int goalWidth)
 {
     initialize_allowed_directions();
     calculate_border();
+    calculate_neighbours();
 }
 
 int Field::width() const
@@ -334,8 +335,9 @@ void Field::fix_goal_area_neighbours()
 
 void Field::calculate_neighbours()
 {
+    m_neighbours.assign(m_verticesCount, {});
     calculate_regular_neighbours();
-    
+ 
     // Fix neighbours that point into score fields.
     // Normal +/- m_width offsets do not work there 
     // because score rows have m_goalWidth vertices, not m_width vertices

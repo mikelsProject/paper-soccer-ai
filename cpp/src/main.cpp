@@ -7,11 +7,11 @@
 
 namespace Color
 {
-    constexpr const char* reset  = "\033[0m";
-    constexpr const char* red    = "\033[31m";
-    constexpr const char* green  = "\033[32m";
-    constexpr const char* yellow = "\033[33m";
-    constexpr const char* blue   = "\033[34m";
+    constexpr const char* Reset  = "\033[0m";
+    constexpr const char* Red    = "\033[31m";
+    constexpr const char* Green  = "\033[32m";
+    constexpr const char* Yellow = "\033[33m";
+    constexpr const char* Blue   = "\033[34m";
 }
 
 void print_board(const Game& soccer, int width, int height, int goalWidth)
@@ -25,22 +25,22 @@ void print_board(const Game& soccer, int width, int height, int goalWidth)
             if(id == soccer.ball_position())
             {
                 if(soccer.player_to_move() == Game::Player::Top)
-                    std::cout << Color::green;
+                    std::cout << Color::Green;
                 else
-                    std::cout << Color::red;
+                    std::cout << Color::Red;
                 std::cout << "BAL ";
-                std::cout << Color::reset;
+                std::cout << Color::Reset;
             }
             else
             {
                 if(soccer.was_visited(id))
-                    std::cout << Color::blue;
+                    std::cout << Color::Blue;
                 if(id < 10)
                     std::cout << " ";
                 if(id < 100)
                     std::cout << " ";
                 std::cout << id << " ";
-                std::cout << Color::reset;
+                std::cout << Color::Reset;
             }
         }
         std::cout << std::endl;

@@ -1,6 +1,6 @@
 # Paper Soccer AI
 
-## Project Description
+## Project description
 
 Paper Soccer AI is a project created for the **Applied Machine Learning** course.
 The goal of the project is to implement the classic **Paper Soccer** game and test several computer players, including a simple neural-network player trained with **PyTorch**.
@@ -18,7 +18,7 @@ Even though the rules are simple, the game can quickly become strategic. Each mo
 
 ---
 
-## Game Rules
+## Game rules
 
 The game is played on a grid with two goals. In this project the board size is:
 
@@ -28,7 +28,7 @@ Height: 13 vertices
 Goal width: 5 vertices
 ```
 
-### Basic Rules
+### Basic rules
 
 1. The ball starts in the middle of the board.
 2. Players take turns moving the ball.
@@ -38,7 +38,7 @@ Goal width: 5 vertices
 6. A player wins by moving the ball into the opponent's goal.
 7. If a player has no legal moves, that player loses.
 
-### Bounce Rule
+### Bounce rule
 
 If the ball reaches a point that was already visited, or reaches the border of the field, the same player moves again.
 
@@ -46,7 +46,7 @@ Because of this, one turn may contain more than one small move. This is one of t
 
 ---
 
-## Move Controls
+## Move controls
 
 In the terminal version, moves are selected using numpad-style controls:
 
@@ -73,7 +73,7 @@ In the web version, legal moves are shown as green clickable circles.
 
 ---
 
-## Implemented Modes
+## Implemented modes
 
 When the game starts, the player can choose the bot mode:
 
@@ -103,7 +103,7 @@ Illegal moves are masked before choosing the final move, so the neural bot shoul
 
 ---
 
-## Machine Learning Approach
+## Machine learning approach
 
 The model treats Paper Soccer as a move prediction problem.
 
@@ -135,7 +135,7 @@ The model does not directly control the game rules. The C++ engine and Python lo
 
 ---
 
-## Project Structure
+## Project structure
 
 ```text
 paper-soccer-ai/
@@ -160,7 +160,6 @@ paper-soccer-ai/
 │   ├── play.py
 │   ├── search_bot.py
 │   ├── train.py
-│   ├── visualize_game.py
 │   └── web_server.py
 │
 ├── README.md
@@ -169,9 +168,9 @@ paper-soccer-ai/
 
 ---
 
-## What Each Part Does
+## What each part does
 
-### C++ Files
+### C++ files
 
 `direction.hpp` defines the 8 possible move directions, direction masks and opposite directions.
 
@@ -185,7 +184,7 @@ paper-soccer-ai/
 
 `CMakeLists.txt` is used to build the C++ executable with CMake.
 
-### Python Files
+### Python files
 
 `parse.py` loads `cpp/gamestate.txt` and converts it into a Python `GameState` object. It also creates the tensor input used by the neural network.
 
@@ -203,7 +202,6 @@ paper-soccer-ai/
 
 `dataset.py` defines a small PyTorch dataset wrapper.
 
-`visualize_game.py` creates a static `board.html` visualization from the current game state.
 
 `web_server.py` starts a local web server. It shows the board in the browser, refreshes the game state and lets the human player choose legal moves by clicking.
 
@@ -261,7 +259,7 @@ python/saved_models/training_history_v2.csv
 
 ---
 
-## Important Dataset Note
+## Important dataset note
 
 The heavy dataset files are not included in the repository. They can be generated again when needed.
 
@@ -279,7 +277,7 @@ python/data/
 
 ---
 
-## How to Run
+## How to run
 
 ### 1. Create Python Environment
 
@@ -349,32 +347,49 @@ Use the numpad-style controls to make moves.
 
 ### 4. Run the Web Version
 
-Open two terminals.
+The newest web version is started directly from the Python web server.  
+You do not need to manually start the C++ game in a second terminal.
 
-In the first terminal, start the Python web server from the project root:
+From the project root, run:
 
 ```bash
 python python/web_server.py
 ```
 
-Then open:
+Then open the address printed in the terminal. Usually it will be:
 
 ```text
-http://localhost:5000
+http://localhost:8000
 ```
 
-In the second terminal, go to the C++ folder and run:
+If port `8000` is blocked, the server may use:
 
-```bash
-cd cpp
-./build/soccer.exe web
+```text
+http://localhost:8080
 ```
 
-The board will be shown in the browser. When it is your turn, click one of the green legal move circles.
+In the browser panel you can choose:
+
+```text
+Your side
+Bot mode
+Search max depth
+Search thinking time
+```
+
+Then press:
+
+```text
+Start new game
+```
+
+The web server starts or restarts the C++ game automatically. The board is shown in the browser and refreshes during play. When it is your turn, click one of the green legal move circles.
+
+The search thinking time only affects the search bot. Heuristic and neural modes are almost instant.
 
 ---
 
-## How to Generate Data and Train the Neural Bot
+## How to generate data and train the neural network
 
 First make sure the C++ game created an initial `gamestate.txt`. You can run:
 

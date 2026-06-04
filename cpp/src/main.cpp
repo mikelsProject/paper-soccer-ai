@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -150,22 +151,22 @@ std::string choose_bot_mode()
     return "neural";
 }
 
-void update_visualization()
+bool run_python_bot(const std::string& botMode, int maxDepth, double timeLimit)
 {
-    std::string command = "cmd /C \"..\\.venv\\Scripts\\python.exe ..\\python\\visualize_game.py > visualize_log.txt 2>&1\"";
-    std::system(command.c_str());
-}
+    std::ostringstream command;
 
-bool run_python_bot(const std::string& botMode)
-{
-    std::string command = "cmd /C \"..\\.venv\\Scripts\\python.exe ..\\python\\play.py " + botMode + " > bot_log.txt 2>&1\"";
+    command << "cmd /C \"..\\.venv\\Scripts\\python.exe ..\\python\\play.py " << botMode;
 
-    int result = std::system(command.c_str());
+    if (botMode == "search") {
+        command << " " << maxDepth << " " << timeLimit;
+    }
+
+    command << " > bot_log.txt 2>&1\"";
+
+    int result = std::system(command.str().c_str());
 
     return result == 0;
 }
-
-// web
 
 void write_web_status(const std::string& status)
 {
@@ -191,9 +192,10 @@ int wait_for_web_move()
     }
 }
 
-void play_web(Game& soccer, Game::Player humanPlayer, const std::string& botMode)
+void play_web(Game& soccer, Game::Player humanPlayer, const std::string& botMode, int maxDepth, double timeLimit)
 {
     std::remove("web_move.txt");
+    std::remove("move.txt");
 
     while (!soccer.is_game_over()) {
         if (soccer.player_to_move() == humanPlayer) {
@@ -212,7 +214,8 @@ void play_web(Game& soccer, Game::Player humanPlayer, const std::string& botMode
         } else {
             write_web_status("bot");
 
-            if (!run_python_bot(botMode)) {
+            if (!run_python_bot(botMode, maxDepth, timeLimit)) {
+                write_web_status("bot_failed");
                 std::cout << "Bot failed\n";
                 return;
             }
@@ -221,6 +224,7 @@ void play_web(Game& soccer, Game::Player humanPlayer, const std::string& botMode
             Direction::Value direction = static_cast<Direction::Value>(aiMove);
 
             if (!is_valid_direction(direction)) {
+                write_web_status("invalid_bot_move");
                 std::cout << "Invalid bot move\n";
                 return;
             }
@@ -228,13 +232,18 @@ void play_web(Game& soccer, Game::Player humanPlayer, const std::string& botMode
             Game::MoveResult result = soccer.make_move(direction);
 
             if (!result.moved) {
+                write_web_status("illegal_bot_move");
                 std::cout << "Illegal bot move\n";
                 return;
             }
         }
     }
 
-    write_web_status("gameover");
+    if (soccer.winner().has_value()) {
+        write_web_status("gameover_" + player_name(soccer.winner().value()));
+    } else {
+        write_web_status("gameover");
+    }
 }
 
 int main(int argc, char* argv[])
@@ -244,10 +253,43 @@ int main(int argc, char* argv[])
     int goalWidth = 5;
 
     Game soccer(width, height, goalWidth);
-    update_visualization();
 
     if (argc > 1 && std::string(argv[1]) == "init") {
+        write_web_status("waiting");
         std::cout << "Initial gamestate saved\n";
+        return 0;
+    }
+
+    if (argc > 1 && std::string(argv[1]) == "web") {
+        int side = 1;
+        std::string botMode = "search";
+        int maxDepth = 8;
+        double timeLimit = 2.0;
+
+        if (argc > 2)
+            side = std::stoi(argv[2]);
+
+        if (argc > 3)
+            botMode = argv[3];
+
+        if (argc > 4)
+            maxDepth = std::stoi(argv[4]);
+
+        if (argc > 5)
+            timeLimit = std::stod(argv[5]);
+
+        Game::Player humanPlayer = Game::Player::Top;
+
+        if (side == 1)
+            humanPlayer = Game::Player::Bottom;
+
+        std::cout << "Paper Soccer AI web game\n";
+        std::cout << "Human: " << player_name(humanPlayer) << "\n";
+        std::cout << "Bot: " << botMode << "\n";
+        std::cout << "Search max depth: " << maxDepth << "\n";
+        std::cout << "Search time limit: " << timeLimit << " s\n";
+
+        play_web(soccer, humanPlayer, botMode, maxDepth, timeLimit);
         return 0;
     }
 
@@ -269,14 +311,11 @@ int main(int argc, char* argv[])
         humanPlayer = Game::Player::Bottom;
 
     std::string botMode = choose_bot_mode();
+    int maxDepth = 8;
+    double timeLimit = 2.0;
 
     std::cout << "\nYou: " << player_name(humanPlayer) << "\n";
     std::cout << "Bot: " << botMode << "\n";
-
-    if (argc > 1 && std::string(argv[1]) == "web") {
-        play_web(soccer, humanPlayer, botMode);
-        return 0;
-    }
 
     while (!soccer.is_game_over()) {
         print_board(soccer, width, height, goalWidth);
@@ -301,10 +340,8 @@ int main(int argc, char* argv[])
                 std::cout << "Illegal move\n";
                 continue;
             }
-
-            update_visualization();
         } else {
-            if (!run_python_bot(botMode)) {
+            if (!run_python_bot(botMode, maxDepth, timeLimit)) {
                 std::cout << "Bot failed, check the bot_log.txt\n";
                 return 1;
             }
@@ -324,8 +361,6 @@ int main(int argc, char* argv[])
                 std::cout << "Illegal bot move: " << aiMove << "\n";
                 return 1;
             }
-
-            update_visualization();
 
             std::cout << "Bot: " << aiMove << " (" << direction_name(direction) << ")\n";
         }

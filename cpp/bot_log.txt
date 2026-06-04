@@ -1,94 +1,34 @@
 Using state file: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\gamestate.txt
-Mode: search
+Mode: neural
 
 Player: 0
 Vertices: 153
-Current vertex: 131
+Current vertex: 97
 Input size: 1531
 
 Legal moves count: 7
 
 Legal moves and heuristic scores:
-0 up :  120 score: 4.05
-1 up-right :  121 score: 4.05
-2 right :  132 score: 3.75
-3 down-right :  143 score: 4.0
-4 down :  142 score: 4.0
-5 down-left :  141 score: 4.0
-6 left :  130 score: 3.75
+0 up :  86 score: 2.75
+2 right :  98 score: 3.0
+3 down-right :  109 score: 3.25
+4 down :  108 score: 3.25
+5 down-left :  107 score: 3.25
+6 left :  96 score: 3.0
+7 up-left :  85 score: 2.75
 
+Loaded model: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\python\saved_models\policy_model_v2.pth
 
-Searching depth: 1
-search 0 up value: 3.925
-search 1 up-right value: 3.925
-search 2 right value: -1.925
-search 6 left value: -1.925
-search 3 down-right value: -1.675
-search 4 down value: -1.675
-search 5 down-left value: -1.675
-Completed depth: 1 best move: 0 value: 3.925 time: 0.0 s
-
-Searching depth: 2
-search 0 up value: 3.925
-search 1 up-right value: 3.925
-search 2 right value: -1.925
-search 6 left value: -1.925
-search 3 down-right value: -1.3
-search 4 down value: 4.425
-search 5 down-left value: -1.3
-Completed depth: 2 best move: 4 value: 4.425 time: 0.02 s
-
-Searching depth: 3
-search 0 up value: 4.175
-search 1 up-right value: 4.175
-search 2 right value: -1.925
-search 6 left value: -1.925
-search 3 down-right value: 4.3
-search 4 down value: 4.3
-search 5 down-left value: 4.3
-Completed depth: 3 best move: 3 value: 4.3 time: 0.09 s
-
-Searching depth: 4
-search 0 up value: 3.925
-search 1 up-right value: -1.675
-search 2 right value: -1.925
-search 6 left value: -2.175
-search 3 down-right value: 4.05
-search 4 down value: 1000.0
-search 5 down-left value: 4.05
-Completed depth: 4 best move: 4 value: 1000.0 time: 0.32 s
-
-Searching depth: 5
-search 0 up value: 4.425
-search 1 up-right value: 4.425
-search 2 right value: -2.175
-search 6 left value: -2.175
-search 3 down-right value: 3.925
-search 4 down value: 1000.0
-search 5 down-left value: 3.925
-Completed depth: 5 best move: 4 value: 1000.0 time: 0.88 s
-
-Searching depth: 6
-search 0 up value: 4.3
-search 1 up-right value: 4.3
-search 2 right value: -2.175
-search 6 left value: -1.925
-search 3 down-right value: -1.675
-search 4 down value: 1000.0
-search 5 down-left value: -1.675
-Completed depth: 6 best move: 4 value: 1000.0 time: 2.27 s
-
-Searching depth: 7
-search 0 up value: 1000.0
-search 1 up-right value: 1000.0
-search 2 right value: -2.175
-search 6 left value: -1.8
-search 3 down-right value: 3.425
-search 4 down value: 1000.0
-search 5 down-left value: 3.425
-time limit reached after depth: 7
+Neural predicted scores:
+0 up score: 0.1864
+2 right score: 0.3255
+3 down-right score: 0.3564
+4 down score: 0.5379
+5 down-left score: -0.0741
+6 left score: -0.3811
+7 up-left score: -0.9402
 
 Selected move: 4 down
-Score: 1000.0
+Score: 0.5379
 
 Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt

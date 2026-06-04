@@ -1,824 +1,411 @@
-
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
-    <title>Paper Soccer AI Board</title>
+    <title>Paper Soccer AI</title>
     <style>
-        body {
-            background: #111;
-            color: #eee;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            padding: 30px;
+        * {
+            box-sizing: border-box;
         }
 
-        .container {
-            background: #1b1b1b;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.4);
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, #233044 0, #10131a 45%, #08090d 100%);
+            color: #eeeeee;
+            font-family: Arial, sans-serif;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 24px auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 18px;
         }
 
         h1 {
-            margin-top: 0;
-            font-size: 24px;
+            margin: 0;
+            letter-spacing: 1px;
+            font-size: 34px;
+        }
+
+        .subtitle {
+            color: #aab2c0;
+            margin-top: 6px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 310px;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .card {
+            background: rgba(24, 28, 38, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+        }
+
+        .board-card {
+            padding: 16px;
+            min-height: 908px;
+        }
+
+        .panel {
+            padding: 18px;
+            min-height: 908px;
+            display: flex;
+            flex-direction: column;
         }
 
         svg {
-            background: #f7f7f7;
+            width: 100%;
+            background: #f7f7f2;
             border-radius: 14px;
+            display: block;
+        }
+
+        .panel-content {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            color: #cbd3df;
+            font-size: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #394150;
+            background: #10141d;
+            color: #f0f3f8;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 40px;
+            padding: 12px 14px;
+            border: 0;
+            border-radius: 12px;
+            background: #3ddc84;
+            color: #06130c;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(1.08);
         }
 
         .info {
-            margin-top: 15px;
-            color: #ccc;
+            margin-top: 18px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #dbe2ec;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 10px;
+            background: orange;
+            color: #dbe8ff;
+            margin-top: 6px;
+        }
+
+        .move-hit {
+            cursor: pointer;
+            fill: transparent;
+            pointer-events: all;
+        }
+
+        .move-dot {
+            pointer-events: none;
+        }
+
+        .move-group {
+            cursor: pointer;
+        }
+
+        .move-group:hover .move-dot {
+            opacity: 0.95;
+        }
+
+        .hint {
+            color: #9aa6b8;
+            font-size: 13px;
+            line-height: 1.45;
+            margin-top: 12px;
+        }
+
+        .github-link {
+            display: block;
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #9ec5ff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .github-link:hover {
+            color: #cfe2ff;
+        }
+
+        .error {
+            color: #ffb4b4;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .board-card,
+            .panel {
+                min-height: auto;
+            }
+
+            .panel {
+                position: static;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Paper Soccer AI</h1>
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Paper Soccer AI</h1>
+                <div class="subtitle">Play against heuristic, search or neural bot directly from the browser.</div>
+            </div>
+        </div>
 
-        <svg width="710" height="930">
-<circle cx="80" cy="135" r="4" fill="#888" />
-<circle cx="135" cy="135" r="4" fill="#888" />
-<circle cx="190" cy="135" r="4" fill="#888" />
-<circle cx="245" cy="135" r="4" fill="#888" />
-<circle cx="300" cy="135" r="4" fill="#888" />
-<circle cx="355" cy="135" r="4" fill="#888" />
-<circle cx="410" cy="135" r="4" fill="#888" />
-<circle cx="465" cy="135" r="4" fill="#888" />
-<circle cx="520" cy="135" r="4" fill="#888" />
-<circle cx="575" cy="135" r="4" fill="#888" />
-<circle cx="630" cy="135" r="4" fill="#888" />
-<circle cx="80" cy="190" r="4" fill="#888" />
-<circle cx="135" cy="190" r="4" fill="#888" />
-<circle cx="190" cy="190" r="4" fill="#888" />
-<circle cx="245" cy="190" r="4" fill="#888" />
-<circle cx="300" cy="190" r="4" fill="#888" />
-<circle cx="355" cy="190" r="4" fill="#888" />
-<circle cx="410" cy="190" r="4" fill="#888" />
-<circle cx="465" cy="190" r="4" fill="#888" />
-<circle cx="520" cy="190" r="4" fill="#888" />
-<circle cx="575" cy="190" r="4" fill="#888" />
-<circle cx="630" cy="190" r="4" fill="#888" />
-<circle cx="80" cy="245" r="4" fill="#888" />
-<circle cx="135" cy="245" r="4" fill="#888" />
-<circle cx="190" cy="245" r="4" fill="#888" />
-<circle cx="245" cy="245" r="4" fill="#888" />
-<circle cx="300" cy="245" r="4" fill="#888" />
-<circle cx="355" cy="245" r="4" fill="#888" />
-<circle cx="410" cy="245" r="4" fill="#888" />
-<circle cx="465" cy="245" r="4" fill="#888" />
-<circle cx="520" cy="245" r="4" fill="#888" />
-<circle cx="575" cy="245" r="4" fill="#888" />
-<circle cx="630" cy="245" r="4" fill="#888" />
-<circle cx="80" cy="300" r="4" fill="#888" />
-<circle cx="135" cy="300" r="4" fill="#888" />
-<circle cx="190" cy="300" r="4" fill="#888" />
-<circle cx="245" cy="300" r="4" fill="#888" />
-<circle cx="300" cy="300" r="4" fill="#888" />
-<circle cx="355" cy="300" r="4" fill="#888" />
-<circle cx="410" cy="300" r="4" fill="#888" />
-<circle cx="465" cy="300" r="4" fill="#888" />
-<circle cx="520" cy="300" r="4" fill="#888" />
-<circle cx="575" cy="300" r="4" fill="#888" />
-<circle cx="630" cy="300" r="4" fill="#888" />
-<circle cx="80" cy="355" r="4" fill="#888" />
-<circle cx="135" cy="355" r="4" fill="#888" />
-<circle cx="190" cy="355" r="4" fill="#888" />
-<circle cx="245" cy="355" r="4" fill="#888" />
-<circle cx="300" cy="355" r="4" fill="#888" />
-<circle cx="355" cy="355" r="4" fill="#888" />
-<circle cx="410" cy="355" r="4" fill="#888" />
-<circle cx="465" cy="355" r="4" fill="#888" />
-<circle cx="520" cy="355" r="4" fill="#888" />
-<circle cx="575" cy="355" r="4" fill="#888" />
-<circle cx="630" cy="355" r="4" fill="#888" />
-<circle cx="80" cy="410" r="4" fill="#888" />
-<circle cx="135" cy="410" r="4" fill="#888" />
-<circle cx="190" cy="410" r="4" fill="#888" />
-<circle cx="245" cy="410" r="4" fill="#888" />
-<circle cx="300" cy="410" r="4" fill="#888" />
-<circle cx="355" cy="410" r="4" fill="#888" />
-<circle cx="410" cy="410" r="4" fill="#888" />
-<circle cx="465" cy="410" r="4" fill="#888" />
-<circle cx="520" cy="410" r="4" fill="#888" />
-<circle cx="575" cy="410" r="4" fill="#888" />
-<circle cx="630" cy="410" r="4" fill="#888" />
-<circle cx="80" cy="465" r="4" fill="#888" />
-<circle cx="135" cy="465" r="4" fill="#888" />
-<circle cx="190" cy="465" r="4" fill="#888" />
-<circle cx="245" cy="465" r="4" fill="#888" />
-<circle cx="300" cy="465" r="4" fill="#888" />
-<circle cx="355" cy="465" r="4" fill="#888" />
-<circle cx="410" cy="465" r="4" fill="#888" />
-<circle cx="465" cy="465" r="4" fill="#888" />
-<circle cx="520" cy="465" r="4" fill="#888" />
-<circle cx="575" cy="465" r="4" fill="#888" />
-<circle cx="630" cy="465" r="4" fill="#888" />
-<circle cx="80" cy="520" r="4" fill="#888" />
-<circle cx="135" cy="520" r="4" fill="#888" />
-<circle cx="190" cy="520" r="4" fill="#888" />
-<circle cx="245" cy="520" r="4" fill="#888" />
-<circle cx="300" cy="520" r="4" fill="#888" />
-<circle cx="355" cy="520" r="4" fill="#888" />
-<circle cx="410" cy="520" r="4" fill="#888" />
-<circle cx="465" cy="520" r="4" fill="#888" />
-<circle cx="520" cy="520" r="4" fill="#888" />
-<circle cx="575" cy="520" r="4" fill="#888" />
-<circle cx="630" cy="520" r="4" fill="#888" />
-<circle cx="80" cy="575" r="4" fill="#888" />
-<circle cx="135" cy="575" r="4" fill="#888" />
-<circle cx="190" cy="575" r="4" fill="#888" />
-<circle cx="245" cy="575" r="4" fill="#888" />
-<circle cx="300" cy="575" r="4" fill="#888" />
-<circle cx="355" cy="575" r="4" fill="#888" />
-<circle cx="410" cy="575" r="4" fill="#888" />
-<circle cx="465" cy="575" r="4" fill="#888" />
-<circle cx="520" cy="575" r="4" fill="#888" />
-<circle cx="575" cy="575" r="4" fill="#888" />
-<circle cx="630" cy="575" r="4" fill="#888" />
-<circle cx="80" cy="630" r="4" fill="#888" />
-<circle cx="135" cy="630" r="4" fill="#888" />
-<circle cx="190" cy="630" r="4" fill="#888" />
-<circle cx="245" cy="630" r="4" fill="#888" />
-<circle cx="300" cy="630" r="4" fill="#888" />
-<circle cx="355" cy="630" r="4" fill="#888" />
-<circle cx="410" cy="630" r="4" fill="#888" />
-<circle cx="465" cy="630" r="4" fill="#888" />
-<circle cx="520" cy="630" r="4" fill="#888" />
-<circle cx="575" cy="630" r="4" fill="#888" />
-<circle cx="630" cy="630" r="4" fill="#888" />
-<circle cx="80" cy="685" r="4" fill="#888" />
-<circle cx="135" cy="685" r="4" fill="#888" />
-<circle cx="190" cy="685" r="4" fill="#888" />
-<circle cx="245" cy="685" r="4" fill="#888" />
-<circle cx="300" cy="685" r="4" fill="#888" />
-<circle cx="355" cy="685" r="4" fill="#888" />
-<circle cx="410" cy="685" r="4" fill="#888" />
-<circle cx="465" cy="685" r="4" fill="#888" />
-<circle cx="520" cy="685" r="4" fill="#888" />
-<circle cx="575" cy="685" r="4" fill="#888" />
-<circle cx="630" cy="685" r="4" fill="#888" />
-<circle cx="80" cy="740" r="4" fill="#888" />
-<circle cx="135" cy="740" r="4" fill="#888" />
-<circle cx="190" cy="740" r="4" fill="#888" />
-<circle cx="245" cy="740" r="4" fill="#888" />
-<circle cx="300" cy="740" r="4" fill="#888" />
-<circle cx="355" cy="740" r="4" fill="#888" />
-<circle cx="410" cy="740" r="4" fill="#888" />
-<circle cx="465" cy="740" r="4" fill="#888" />
-<circle cx="520" cy="740" r="4" fill="#888" />
-<circle cx="575" cy="740" r="4" fill="#888" />
-<circle cx="630" cy="740" r="4" fill="#888" />
-<circle cx="80" cy="795" r="4" fill="#888" />
-<circle cx="135" cy="795" r="4" fill="#888" />
-<circle cx="190" cy="795" r="4" fill="#888" />
-<circle cx="245" cy="795" r="4" fill="#888" />
-<circle cx="300" cy="795" r="4" fill="#888" />
-<circle cx="355" cy="795" r="4" fill="#888" />
-<circle cx="410" cy="795" r="4" fill="#888" />
-<circle cx="465" cy="795" r="4" fill="#888" />
-<circle cx="520" cy="795" r="4" fill="#888" />
-<circle cx="575" cy="795" r="4" fill="#888" />
-<circle cx="630" cy="795" r="4" fill="#888" />
-<line x1="135" y1="135" x2="190" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="135" x2="135" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="135" x2="80" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="135" x2="245" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="135" x2="190" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="135" x2="135" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="135" x2="300" y2="135" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="135" x2="300" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="135" x2="245" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="135" x2="190" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="135" x2="355" y2="135" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="135" x2="355" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="135" x2="300" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="135" x2="245" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="135" x2="410" y2="135" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="135" x2="410" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="135" x2="355" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="135" x2="300" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="135" x2="465" y2="135" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="135" x2="465" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="135" x2="410" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="135" x2="355" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="135" x2="520" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="135" x2="465" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="135" x2="410" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="135" x2="575" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="135" x2="520" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="135" x2="465" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="135" x2="630" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="135" x2="575" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="135" x2="520" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="190" x2="135" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="190" x2="135" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="190" x2="190" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="190" x2="190" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="190" x2="135" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="190" x2="80" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="190" x2="245" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="190" x2="245" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="190" x2="190" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="190" x2="135" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="190" x2="300" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="190" x2="300" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="190" x2="245" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="190" x2="190" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="190" x2="355" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="190" x2="355" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="190" x2="300" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="190" x2="245" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="190" x2="410" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="190" x2="410" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="190" x2="355" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="190" x2="300" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="190" x2="465" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="190" x2="465" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="190" x2="410" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="190" x2="355" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="190" x2="520" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="190" x2="520" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="190" x2="465" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="190" x2="410" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="190" x2="575" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="190" x2="575" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="190" x2="520" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="190" x2="465" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="190" x2="630" y2="190" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="190" x2="630" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="190" x2="575" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="190" x2="520" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="190" x2="575" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="245" x2="135" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="245" x2="135" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="245" x2="190" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="245" x2="190" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="245" x2="135" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="245" x2="80" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="245" x2="245" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="245" x2="245" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="245" x2="190" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="245" x2="135" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="245" x2="300" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="245" x2="300" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="245" x2="245" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="245" x2="190" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="245" x2="355" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="245" x2="355" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="245" x2="300" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="245" x2="245" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="245" x2="410" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="245" x2="410" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="245" x2="355" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="245" x2="300" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="245" x2="465" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="245" x2="465" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="245" x2="410" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="245" x2="355" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="245" x2="520" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="245" x2="520" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="245" x2="465" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="245" x2="410" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="245" x2="575" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="245" x2="575" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="245" x2="520" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="245" x2="465" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="245" x2="630" y2="245" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="245" x2="630" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="245" x2="575" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="245" x2="520" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="245" x2="575" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="300" x2="135" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="300" x2="135" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="300" x2="190" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="300" x2="190" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="300" x2="135" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="300" x2="80" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="300" x2="245" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="300" x2="245" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="300" x2="190" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="300" x2="135" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="300" x2="300" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="300" x2="300" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="300" x2="245" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="300" x2="190" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="300" x2="355" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="300" x2="355" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="300" x2="300" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="300" x2="245" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="300" x2="410" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="300" x2="410" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="300" x2="355" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="300" x2="300" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="300" x2="465" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="300" x2="465" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="300" x2="410" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="300" x2="355" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="300" x2="520" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="300" x2="520" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="300" x2="465" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="300" x2="410" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="300" x2="575" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="300" x2="575" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="300" x2="520" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="300" x2="465" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="300" x2="630" y2="300" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="300" x2="630" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="300" x2="575" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="300" x2="520" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="300" x2="575" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="355" x2="135" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="355" x2="135" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="355" x2="190" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="355" x2="190" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="355" x2="135" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="355" x2="80" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="355" x2="245" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="355" x2="245" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="355" x2="190" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="355" x2="135" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="355" x2="300" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="355" x2="300" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="355" x2="245" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="355" x2="190" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="355" x2="355" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="355" x2="355" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="355" x2="300" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="355" x2="245" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="355" x2="410" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="355" x2="410" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="355" x2="355" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="355" x2="300" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="355" x2="465" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="355" x2="465" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="355" x2="410" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="355" x2="355" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="355" x2="520" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="355" x2="520" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="355" x2="465" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="355" x2="410" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="355" x2="575" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="355" x2="575" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="355" x2="520" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="355" x2="465" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="355" x2="630" y2="355" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="355" x2="630" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="355" x2="575" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="355" x2="520" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="355" x2="575" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="410" x2="135" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="410" x2="135" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="410" x2="190" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="410" x2="190" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="410" x2="135" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="410" x2="80" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="410" x2="245" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="410" x2="245" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="410" x2="190" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="410" x2="135" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="410" x2="300" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="410" x2="300" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="410" x2="245" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="410" x2="190" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="410" x2="355" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="410" x2="355" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="410" x2="300" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="410" x2="245" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="410" x2="410" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="410" x2="410" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="410" x2="355" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="410" x2="300" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="410" x2="465" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="410" x2="465" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="410" x2="410" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="410" x2="355" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="410" x2="520" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="410" x2="520" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="410" x2="465" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="410" x2="410" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="410" x2="575" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="410" x2="575" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="410" x2="520" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="410" x2="465" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="410" x2="630" y2="410" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="410" x2="630" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="410" x2="575" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="410" x2="520" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="410" x2="575" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="465" x2="135" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="465" x2="135" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="465" x2="190" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="465" x2="190" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="465" x2="135" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="465" x2="80" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="465" x2="245" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="465" x2="245" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="465" x2="190" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="465" x2="135" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="465" x2="300" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="465" x2="300" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="465" x2="245" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="465" x2="190" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="465" x2="355" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="465" x2="355" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="465" x2="300" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="465" x2="245" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="465" x2="410" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="465" x2="410" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="465" x2="355" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="465" x2="300" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="465" x2="465" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="465" x2="465" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="465" x2="410" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="465" x2="355" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="465" x2="520" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="465" x2="520" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="465" x2="465" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="465" x2="410" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="465" x2="575" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="465" x2="575" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="465" x2="520" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="465" x2="465" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="465" x2="630" y2="465" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="465" x2="630" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="465" x2="575" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="465" x2="520" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="465" x2="575" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="520" x2="135" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="520" x2="135" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="520" x2="190" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="520" x2="190" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="520" x2="135" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="520" x2="80" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="520" x2="245" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="520" x2="245" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="520" x2="190" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="520" x2="135" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="520" x2="300" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="520" x2="300" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="520" x2="245" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="520" x2="190" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="520" x2="355" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="520" x2="355" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="520" x2="300" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="520" x2="245" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="520" x2="410" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="520" x2="410" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="520" x2="355" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="520" x2="300" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="520" x2="465" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="520" x2="465" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="520" x2="410" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="520" x2="355" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="520" x2="520" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="520" x2="520" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="520" x2="465" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="520" x2="410" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="520" x2="575" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="520" x2="575" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="520" x2="520" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="520" x2="465" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="520" x2="630" y2="520" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="520" x2="630" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="520" x2="575" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="520" x2="520" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="520" x2="575" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="575" x2="135" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="575" x2="135" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="575" x2="190" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="575" x2="190" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="575" x2="135" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="575" x2="80" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="575" x2="245" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="575" x2="245" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="575" x2="190" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="575" x2="135" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="575" x2="300" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="575" x2="300" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="575" x2="245" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="575" x2="190" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="575" x2="355" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="575" x2="355" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="575" x2="300" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="575" x2="245" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="575" x2="410" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="575" x2="410" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="575" x2="355" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="575" x2="300" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="575" x2="465" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="575" x2="465" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="575" x2="410" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="575" x2="355" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="575" x2="520" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="575" x2="520" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="575" x2="465" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="575" x2="410" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="575" x2="575" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="575" x2="575" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="575" x2="520" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="575" x2="465" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="575" x2="630" y2="575" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="575" x2="630" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="575" x2="575" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="575" x2="520" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="575" x2="575" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="630" x2="135" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="630" x2="135" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="630" x2="190" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="630" x2="190" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="630" x2="135" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="630" x2="80" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="630" x2="245" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="630" x2="245" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="630" x2="190" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="630" x2="135" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="630" x2="300" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="630" x2="300" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="630" x2="245" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="630" x2="190" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="630" x2="355" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="630" x2="355" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="630" x2="300" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="630" x2="245" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="630" x2="410" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="630" x2="410" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="630" x2="355" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="630" x2="300" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="630" x2="465" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="630" x2="465" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="630" x2="410" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="630" x2="355" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="630" x2="520" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="630" x2="520" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="630" x2="465" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="630" x2="410" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="630" x2="575" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="630" x2="575" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="630" x2="520" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="630" x2="465" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="630" x2="630" y2="630" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="630" x2="630" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="630" x2="575" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="630" x2="520" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="630" x2="575" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="685" x2="135" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="685" x2="135" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="685" x2="190" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="685" x2="190" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="685" x2="135" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="685" x2="80" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="685" x2="245" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="685" x2="245" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="685" x2="190" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="685" x2="135" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="685" x2="300" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="685" x2="300" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="685" x2="245" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="685" x2="190" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="685" x2="355" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="685" x2="355" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="685" x2="300" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="685" x2="245" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="685" x2="410" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="685" x2="410" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="685" x2="355" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="685" x2="300" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="685" x2="465" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="685" x2="465" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="685" x2="410" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="685" x2="355" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="685" x2="520" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="685" x2="520" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="685" x2="465" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="685" x2="410" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="685" x2="575" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="685" x2="575" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="685" x2="520" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="685" x2="465" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="685" x2="630" y2="685" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="685" x2="630" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="685" x2="575" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="685" x2="520" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="685" x2="575" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="740" x2="135" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="80" y1="740" x2="135" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="740" x2="190" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="740" x2="190" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="135" y1="740" x2="135" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="740" x2="245" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="740" x2="245" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="740" x2="190" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="190" y1="740" x2="135" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="740" x2="300" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="740" x2="300" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="740" x2="245" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="740" x2="190" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="740" x2="355" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="740" x2="355" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="740" x2="300" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="740" x2="245" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="740" x2="410" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="740" x2="410" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="740" x2="355" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="740" x2="300" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="740" x2="465" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="740" x2="465" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="740" x2="410" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="740" x2="355" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="740" x2="520" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="740" x2="520" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="740" x2="465" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="740" x2="410" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="740" x2="575" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="740" x2="575" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="740" x2="520" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="520" y1="740" x2="465" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="740" x2="630" y2="740" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="740" x2="575" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="575" y1="740" x2="520" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="630" y1="740" x2="575" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="795" x2="300" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="245" y1="795" x2="300.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="795" x2="355" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="795" x2="355.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="795" x2="300.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="300" y1="795" x2="245.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="795" x2="410" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="795" x2="410.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="795" x2="355.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="355" y1="795" x2="300.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="795" x2="465" y2="795" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="795" x2="465.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="795" x2="410.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="410" y1="795" x2="355.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<line x1="465" y1="795" x2="410.0" y2="850" stroke="#d0d0d0" stroke-width="1" />
-<circle cx="245.0" cy="80" r="4" fill="#555" />
-<circle cx="300.0" cy="80" r="4" fill="#555" />
-<circle cx="355.0" cy="80" r="4" fill="#555" />
-<circle cx="410.0" cy="80" r="4" fill="#555" />
-<circle cx="465.0" cy="80" r="4" fill="#555" />
-<circle cx="80" cy="135" r="4" fill="#555" />
-<circle cx="135" cy="135" r="6" fill="#457b9d" />
-<circle cx="190" cy="135" r="6" fill="#457b9d" />
-<circle cx="245" cy="135" r="6" fill="#457b9d" />
-<circle cx="300" cy="135" r="4" fill="#555" />
-<circle cx="355" cy="135" r="4" fill="#555" />
-<circle cx="410" cy="135" r="4" fill="#555" />
-<circle cx="465" cy="135" r="6" fill="#457b9d" />
-<circle cx="520" cy="135" r="6" fill="#457b9d" />
-<circle cx="575" cy="135" r="6" fill="#457b9d" />
-<circle cx="630" cy="135" r="4" fill="#555" />
-<circle cx="80" cy="190" r="6" fill="#457b9d" />
-<circle cx="135" cy="190" r="4" fill="#555" />
-<circle cx="190" cy="190" r="4" fill="#555" />
-<circle cx="245" cy="190" r="4" fill="#555" />
-<circle cx="300" cy="190" r="4" fill="#555" />
-<circle cx="355" cy="190" r="4" fill="#555" />
-<circle cx="410" cy="190" r="4" fill="#555" />
-<circle cx="465" cy="190" r="4" fill="#555" />
-<circle cx="520" cy="190" r="4" fill="#555" />
-<circle cx="575" cy="190" r="4" fill="#555" />
-<circle cx="630" cy="190" r="6" fill="#457b9d" />
-<circle cx="80" cy="245" r="6" fill="#457b9d" />
-<circle cx="135" cy="245" r="4" fill="#555" />
-<circle cx="190" cy="245" r="4" fill="#555" />
-<circle cx="245" cy="245" r="4" fill="#555" />
-<circle cx="300" cy="245" r="4" fill="#555" />
-<circle cx="355" cy="245" r="4" fill="#555" />
-<circle cx="410" cy="245" r="4" fill="#555" />
-<circle cx="465" cy="245" r="4" fill="#555" />
-<circle cx="520" cy="245" r="4" fill="#555" />
-<circle cx="575" cy="245" r="4" fill="#555" />
-<circle cx="630" cy="245" r="6" fill="#457b9d" />
-<circle cx="80" cy="300" r="6" fill="#457b9d" />
-<circle cx="135" cy="300" r="4" fill="#555" />
-<circle cx="190" cy="300" r="4" fill="#555" />
-<circle cx="245" cy="300" r="4" fill="#555" />
-<circle cx="300" cy="300" r="4" fill="#555" />
-<circle cx="355" cy="300" r="4" fill="#555" />
-<circle cx="410" cy="300" r="4" fill="#555" />
-<circle cx="465" cy="300" r="4" fill="#555" />
-<circle cx="520" cy="300" r="4" fill="#555" />
-<circle cx="575" cy="300" r="4" fill="#555" />
-<circle cx="630" cy="300" r="6" fill="#457b9d" />
-<circle cx="80" cy="355" r="6" fill="#457b9d" />
-<circle cx="135" cy="355" r="4" fill="#555" />
-<circle cx="190" cy="355" r="4" fill="#555" />
-<circle cx="245" cy="355" r="4" fill="#555" />
-<circle cx="300" cy="355" r="4" fill="#555" />
-<circle cx="355" cy="355" r="4" fill="#555" />
-<circle cx="410" cy="355" r="4" fill="#555" />
-<circle cx="465" cy="355" r="4" fill="#555" />
-<circle cx="520" cy="355" r="4" fill="#555" />
-<circle cx="575" cy="355" r="4" fill="#555" />
-<circle cx="630" cy="355" r="6" fill="#457b9d" />
-<circle cx="80" cy="410" r="6" fill="#457b9d" />
-<circle cx="135" cy="410" r="4" fill="#555" />
-<circle cx="190" cy="410" r="4" fill="#555" />
-<circle cx="245" cy="410" r="4" fill="#555" />
-<circle cx="300" cy="410" r="4" fill="#555" />
-<circle cx="355" cy="410" r="4" fill="#555" />
-<circle cx="410" cy="410" r="4" fill="#555" />
-<circle cx="465" cy="410" r="4" fill="#555" />
-<circle cx="520" cy="410" r="4" fill="#555" />
-<circle cx="575" cy="410" r="4" fill="#555" />
-<circle cx="630" cy="410" r="6" fill="#457b9d" />
-<circle cx="80" cy="465" r="6" fill="#457b9d" />
-<circle cx="135" cy="465" r="4" fill="#555" />
-<circle cx="190" cy="465" r="4" fill="#555" />
-<circle cx="245" cy="465" r="4" fill="#555" />
-<circle cx="300" cy="465" r="4" fill="#555" />
-<circle cx="355" cy="465" r="13" fill="#e63946" />
-<circle cx="410" cy="465" r="4" fill="#555" />
-<circle cx="465" cy="465" r="4" fill="#555" />
-<circle cx="520" cy="465" r="4" fill="#555" />
-<circle cx="575" cy="465" r="4" fill="#555" />
-<circle cx="630" cy="465" r="6" fill="#457b9d" />
-<circle cx="80" cy="520" r="6" fill="#457b9d" />
-<circle cx="135" cy="520" r="4" fill="#555" />
-<circle cx="190" cy="520" r="4" fill="#555" />
-<circle cx="245" cy="520" r="4" fill="#555" />
-<circle cx="300" cy="520" r="4" fill="#555" />
-<circle cx="355" cy="520" r="4" fill="#555" />
-<circle cx="410" cy="520" r="4" fill="#555" />
-<circle cx="465" cy="520" r="4" fill="#555" />
-<circle cx="520" cy="520" r="4" fill="#555" />
-<circle cx="575" cy="520" r="4" fill="#555" />
-<circle cx="630" cy="520" r="6" fill="#457b9d" />
-<circle cx="80" cy="575" r="6" fill="#457b9d" />
-<circle cx="135" cy="575" r="4" fill="#555" />
-<circle cx="190" cy="575" r="4" fill="#555" />
-<circle cx="245" cy="575" r="4" fill="#555" />
-<circle cx="300" cy="575" r="4" fill="#555" />
-<circle cx="355" cy="575" r="4" fill="#555" />
-<circle cx="410" cy="575" r="4" fill="#555" />
-<circle cx="465" cy="575" r="4" fill="#555" />
-<circle cx="520" cy="575" r="4" fill="#555" />
-<circle cx="575" cy="575" r="4" fill="#555" />
-<circle cx="630" cy="575" r="6" fill="#457b9d" />
-<circle cx="80" cy="630" r="6" fill="#457b9d" />
-<circle cx="135" cy="630" r="4" fill="#555" />
-<circle cx="190" cy="630" r="4" fill="#555" />
-<circle cx="245" cy="630" r="4" fill="#555" />
-<circle cx="300" cy="630" r="4" fill="#555" />
-<circle cx="355" cy="630" r="4" fill="#555" />
-<circle cx="410" cy="630" r="4" fill="#555" />
-<circle cx="465" cy="630" r="4" fill="#555" />
-<circle cx="520" cy="630" r="4" fill="#555" />
-<circle cx="575" cy="630" r="4" fill="#555" />
-<circle cx="630" cy="630" r="6" fill="#457b9d" />
-<circle cx="80" cy="685" r="6" fill="#457b9d" />
-<circle cx="135" cy="685" r="4" fill="#555" />
-<circle cx="190" cy="685" r="4" fill="#555" />
-<circle cx="245" cy="685" r="4" fill="#555" />
-<circle cx="300" cy="685" r="4" fill="#555" />
-<circle cx="355" cy="685" r="4" fill="#555" />
-<circle cx="410" cy="685" r="4" fill="#555" />
-<circle cx="465" cy="685" r="4" fill="#555" />
-<circle cx="520" cy="685" r="4" fill="#555" />
-<circle cx="575" cy="685" r="4" fill="#555" />
-<circle cx="630" cy="685" r="6" fill="#457b9d" />
-<circle cx="80" cy="740" r="6" fill="#457b9d" />
-<circle cx="135" cy="740" r="4" fill="#555" />
-<circle cx="190" cy="740" r="4" fill="#555" />
-<circle cx="245" cy="740" r="4" fill="#555" />
-<circle cx="300" cy="740" r="4" fill="#555" />
-<circle cx="355" cy="740" r="4" fill="#555" />
-<circle cx="410" cy="740" r="4" fill="#555" />
-<circle cx="465" cy="740" r="4" fill="#555" />
-<circle cx="520" cy="740" r="4" fill="#555" />
-<circle cx="575" cy="740" r="4" fill="#555" />
-<circle cx="630" cy="740" r="6" fill="#457b9d" />
-<circle cx="80" cy="795" r="4" fill="#555" />
-<circle cx="135" cy="795" r="6" fill="#457b9d" />
-<circle cx="190" cy="795" r="6" fill="#457b9d" />
-<circle cx="245" cy="795" r="6" fill="#457b9d" />
-<circle cx="300" cy="795" r="4" fill="#555" />
-<circle cx="355" cy="795" r="4" fill="#555" />
-<circle cx="410" cy="795" r="4" fill="#555" />
-<circle cx="465" cy="795" r="6" fill="#457b9d" />
-<circle cx="520" cy="795" r="6" fill="#457b9d" />
-<circle cx="575" cy="795" r="6" fill="#457b9d" />
-<circle cx="630" cy="795" r="4" fill="#555" />
-<circle cx="245.0" cy="850" r="4" fill="#555" />
-<circle cx="300.0" cy="850" r="4" fill="#555" />
-<circle cx="355.0" cy="850" r="4" fill="#555" />
-<circle cx="410.0" cy="850" r="4" fill="#555" />
-<circle cx="465.0" cy="850" r="4" fill="#555" />
+        <div class="layout">
+            <div class="card board-card">
+                <svg id="board" viewBox="0 0 720 900"></svg>
+            </div>
 
-        </svg>
+            <div class="card panel">
+                <div class="panel-content">
+                    <h2>New game</h2>
 
-        <div class="info">
-            Player to move: 0<br>
-            Ball vertex: 76<br>
-            Legal moves: 8
+                    <label>Your side</label>
+                    <select id="side">
+                        <option value="1">Bottom</option>
+                        <option value="0">Top</option>
+                    </select>
+
+                    <label>Bot mode</label>
+                    <select id="mode">
+                        <option value="heuristic">Heuristic</option>
+                        <option value="search" selected>Search</option>
+                        <option value="neural">Neural</option>
+                    </select>
+
+                    <label>Search max depth</label>
+                    <input id="depth" type="number" min="1" max="12" value="8">
+
+                    <label>Search thinking time [s]</label>
+                    <input id="time" type="number" min="0.2" max="30" step="0.1" value="2.0">
+
+                    <button onclick="newGame()">Start new game</button>
+
+                    <div class="hint">
+                        Thinking time only changes the search bot. Heuristic and neural modes are almost instant.
+                        <br><br>
+                        During your turn, click the green target or the invisible area around it.
+                    </div>
+
+                    <div class="info" id="info"></div>
+                </div>
+
+                <a class="github-link" href="https://github.com/mikelsProject/paper-soccer-ai" target="_blank" rel="noreferrer">
+                    View project on GitHub
+                </a>
+            </div>
         </div>
     </div>
+
+    <script>
+        const scale = 55;
+        const margin = 80;
+
+        function px(x) {
+            return margin + x * scale;
+        }
+
+        function py(y) {
+            return margin + (y + 1) * scale;
+        }
+
+        function el(name, attrs) {
+            const e = document.createElementNS("http://www.w3.org/2000/svg", name);
+
+            for (const key in attrs) {
+                e.setAttribute(key, attrs[key]);
+            }
+
+            return e;
+        }
+
+        async function newGame() {
+            const payload = {
+                side: Number(document.getElementById("side").value),
+                mode: document.getElementById("mode").value,
+                depth: Number(document.getElementById("depth").value),
+                time: Number(document.getElementById("time").value)
+            };
+
+            const response = await fetch("/new-game", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!data.ok) {
+                document.getElementById("info").innerHTML =
+                    "<span class='error'>" + data.message + "</span>";
+            }
+
+            await loadBoard();
+        }
+
+        async function sendMove(move) {
+            await fetch("/move", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ move: move })
+            });
+        }
+
+        function statusText(status) {
+            if (status === "human") return "Your move";
+            if (status === "bot") return "Bot is thinking";
+            if (status.startsWith("gameover_")) return "Game over - " + status.replace("gameover_", "") + " won";
+            if (status === "gameover") return "Game over";
+            if (status === "waiting") return "Waiting for a new game";
+            if (status === "executable_not_found") return "soccer.exe not found";
+            return status;
+        }
+
+        async function loadBoard() {
+            const response = await fetch("/state");
+            const data = await response.json();
+
+            const svg = document.getElementById("board");
+            svg.innerHTML = "";
+
+            if (!data.ready) {
+                document.getElementById("info").innerHTML =
+                    "<span class='pill'>" + statusText(data.status) + "</span><br>" +
+                    data.message;
+                return;
+            }
+
+            for (const edge of data.edges) {
+                svg.appendChild(el("line", {
+                    x1: px(edge.x1),
+                    y1: py(edge.y1),
+                    x2: px(edge.x2),
+                    y2: py(edge.y2),
+                    stroke: edge.used ? "#111827" : "#c8ccd2",
+                    "stroke-width": edge.used ? 4 : 1.2,
+                    "stroke-linecap": "round"
+                }));
+            }
+
+            for (const v of data.vertices) {
+                let color = "#555";
+                let r = 4;
+
+                if (v.visited) {
+                    color = "#3b82f6";
+                    r = 6;
+                }
+
+                if (v.ball) {
+                    color = "#ef4444";
+                    r = 13;
+                }
+
+                svg.appendChild(el("circle", {
+                    cx: px(v.x),
+                    cy: py(v.y),
+                    r: r,
+                    fill: color
+                }));
+            }
+
+            if (data.status === "human") {
+                for (const m of data.legal_moves) {
+                    const g = el("g", {
+                        class: "move-group"
+                    });
+
+                    const hit = el("circle", {
+                        cx: px(m.x),
+                        cy: py(m.y),
+                        r: 34,
+                        class: "move-hit"
+                    });
+
+                    const dot = el("circle", {
+                        cx: px(m.x),
+                        cy: py(m.y),
+                        r: 15,
+                        fill: "rgba(34, 197, 94, 0.55)",
+                        stroke: "#15803d",
+                        "stroke-width": 2,
+                        class: "move-dot"
+                    });
+
+                    g.onclick = () => sendMove(m.move);
+                    g.appendChild(hit);
+                    g.appendChild(dot);
+                    svg.appendChild(g);
+                }
+            }
+
+            let playerName = data.player === 0 ? "Top" : "Bottom";
+            let sideName = data.settings.side === 0 ? "Top" : "Bottom";
+
+            document.getElementById("info").innerHTML =
+                "<span class='pill'>" + statusText(data.status) + "</span><br><br>" +
+                "You: " + sideName + "<br>" +
+                "Bot: " + data.settings.mode + "<br>" +
+                "Search: depth " + data.settings.depth + ", " + data.settings.time + " s<br><br>" +
+                "Player to move: " + playerName + "<br>" +
+                "Ball vertex: " + data.ball + "<br>" +
+                "Legal moves: " + data.legal_count;
+        }
+
+        loadBoard();
+        setInterval(loadBoard, 350);
+    </script>
 </body>
+
 </html>

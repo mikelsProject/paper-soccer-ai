@@ -1,0 +1,5 @@
+Paper Soccer AI web game
+Human: Bottom
+Bot: neural
+Search max depth: 8
+Search time limit: 2 s

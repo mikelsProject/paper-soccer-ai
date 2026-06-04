@@ -1,0 +1,4 @@
+python python/web_server.py
+
+cmake --build build
+./build/soccer.exe web

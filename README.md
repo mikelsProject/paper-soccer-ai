@@ -3,375 +3,426 @@
 ## Project Description
 
 Paper Soccer AI is a project created for the **Applied Machine Learning** course.
-The goal of the project is to implement the classic **Paper Soccer** game and build a neural-network player using **PyTorch**.
+The goal of the project is to implement the classic **Paper Soccer** game and test several computer players, including a simple neural-network player trained with **PyTorch**.
 
-The game engine will be written in **C++**, because the rules, move generation, and game simulation should be fast and clearly separated from the machine-learning code.
-The neural network, training pipeline, and experiments will be written in **Python** using **PyTorch**.
+The project is split into two main parts:
 
-Paper Soccer, also known as Paper Hockey, is a two-player strategy game played on a rectangular grid. Players move the ball by drawing lines between neighboring grid points. The objective is to reach the opponent's goal while avoiding blocked paths and losing positions.
+```text
+C++    -> game engine, rules, legal moves and gameplay loop
+Python -> bots, search algorithm, dataset generation, training and web visualization
+```
 
-Even though the rules are simple, the game contains many strategic decisions. Every drawn line changes the future state of the board, blocks one possible path, and may create bounce moves. This makes Paper Soccer a good small environment for machine learning.
+Paper Soccer is a two-player strategy game played on a rectangular grid. Players move the ball by drawing lines between neighboring points. A used line cannot be used again. The objective is to reach the opponent's goal or force the opponent into a position with no legal moves.
+
+Even though the rules are simple, the game can quickly become strategic. Each move changes the board, blocks one edge and may create an extra move because of the bounce rule. This makes the game a nice small environment for testing search algorithms and neural networks.
 
 ---
 
 ## Game Rules
 
-More information about the game rules can be found here:
-
-https://en.wikipedia.org/wiki/Paper_soccer
-
-The game is played on a rectangular grid representing a football field.
-
-In our project, we plan to use a fixed board size:
+The game is played on a grid with two goals. In this project the board size is:
 
 ```text
-Width: 9 grid points
-Height: 13 grid points
+Width: 11 vertices
+Height: 13 vertices
+Goal width: 5 vertices
 ```
-
-The exact size may still be adjusted during development, but using a fixed board size makes the first version easier to implement, test, and convert into tensors for the neural network.
 
 ### Basic Rules
 
-1. The ball starts in the center of the board.
+1. The ball starts in the middle of the board.
 2. Players take turns moving the ball.
-3. A move is made by drawing a line from the current ball position to one neighboring grid point.
-4. The ball can move in 8 directions:
-   - up
-   - down
-   - left
-   - right
-   - up-left
-   - up-right
-   - down-left
-   - down-right
-5. A line that has already been used cannot be used again.
-6. The ball cannot leave the field, except when it enters a goal.
-7. A player wins by moving the ball into the opponent's goal.
-8. If a player has no legal moves, that player loses.
+3. A move is made to one of 8 neighboring points.
+4. A line that was already used cannot be used again.
+5. The ball cannot leave the field, except when it enters a goal.
+6. A player wins by moving the ball into the opponent's goal.
+7. If a player has no legal moves, that player loses.
 
 ### Bounce Rule
 
-If the ball reaches a point that was already visited, or touches the border of the field, the same player moves again.
+If the ball reaches a point that was already visited, or reaches the border of the field, the same player moves again.
 
-This means that one turn may contain multiple small moves.  
-Because of that, the model should not only understand single moves, but also positions that may lead to longer bounce sequences.
+Because of this, one turn may contain more than one small move. This is one of the reasons why Paper Soccer is more interesting than it looks at first.
 
 ---
 
-## Project Goals
+## Move Controls
 
-The main goal is to create a working Paper Soccer environment and train a simple PyTorch model to play the game.
+In the terminal version, moves are selected using numpad-style controls:
 
-The project focuses on:
+```text
+7 8 9
+4   6
+1 2 3
+```
 
-- implementing the Paper Soccer game logic in C++
-- generating legal moves for the current position
-- storing already used edges
-- detecting goals and losing positions
-- creating a clean interface between C++ and Python
-- representing the board state as a tensor
-- building a PyTorch neural network
-- training the model on generated game data
-- allowing a human to play against the model
-- allowing the model to play games against itself
+They correspond to directions around the current ball position:
+
+```text
+8 -> up
+9 -> up-right
+6 -> right
+3 -> down-right
+2 -> down
+1 -> down-left
+4 -> left
+7 -> up-left
+```
+
+In the web version, legal moves are shown as green clickable circles.
+
+---
+
+## Implemented Modes
+
+When the game starts, the player can choose the bot mode:
+
+```text
+1 - heuristic
+2 - search
+3 - neural
+```
+
+### Heuristic Mode
+
+The heuristic bot uses a hand-written evaluation of the current position. It checks legal moves and scores them using simple game features, for example progress toward the goal and mobility.
+
+This mode is simple, fast and useful as a baseline.
+
+### Search Mode
+
+The search bot uses a minimax-like **negamax** search with alpha-beta pruning. It simulates future moves and tries to find the move that gives the best result for the current player.
+
+This is usually the strongest implemented mode because it actually looks ahead.
+
+### Neural Mode
+
+The neural bot uses a PyTorch model. The current board state is converted into one vector and passed to a fully connected neural network. The network outputs 8 scores, one for each possible direction.
+
+Illegal moves are masked before choosing the final move, so the neural bot should only play legal moves.
 
 ---
 
 ## Machine Learning Approach
 
-The project will follow a workflow similar to basic PyTorch classification tasks.
-
-Instead of classifying images, the model will classify possible moves.
+The model treats Paper Soccer as a move prediction problem.
 
 ```text
-MNIST task:
-image -> neural network -> digit class
-
-Paper Soccer task:
-board state -> neural network -> move direction
+board state -> neural network -> move scores
 ```
 
-The neural network will output 8 values, one for each possible direction.
+The network output has 8 values:
 
 ```text
 0 - up
-1 - down
-2 - left
-3 - right
-4 - up-left
-5 - up-right
-6 - down-left
-7 - down-right
+1 - up-right
+2 - right
+3 - down-right
+4 - down
+5 - down-left
+6 - left
+7 - up-left
 ```
 
-The move with the highest score will be selected only after checking if it is legal.
+The board state contains:
 
----
-
-## Game Engine
-
-The C++ game engine will be responsible for the actual rules of the game.
-
-It should handle:
-
-- board creation
-- current ball position
 - current player
-- legal move generation
-- move execution
-- used edge storage
-- visited point storage
-- bounce detection
-- goal detection
-- game-over detection
+- current ball position
+- allowed directions from every vertex
+- visited / extra-turn vertices
 
-The machine-learning code should not decide whether a move is legal.  
-The C++ engine should always validate the move before it is applied.
-
-This separation makes the project cleaner:
-
-```text
-C++:
-game rules, legal moves, simulation
-
-Python / PyTorch:
-training, neural network, experiments
-```
+The model does not directly control the game rules. The C++ engine and Python logic still check legal moves.
 
 ---
 
-## Board Representation
-
-Before the board is passed to the neural network, it must be converted into a tensor.
-
-For the planned board size, a possible tensor shape is:
-
-```text
-[channels, 13, 9]
-```
-
-Example channels:
-
-1. current ball position
-2. visited points
-3. board borders
-4. current player
-
-This representation is similar to an image with multiple channels, which makes it suitable for PyTorch models.
-
----
-
-## Legal Move Masking
-
-The neural network may output a high score for an illegal move.  
-Because of that, illegal moves must be removed before choosing the final action.
-
-The process is:
-
-1. the C++ engine returns legal moves
-2. the PyTorch model predicts scores for all 8 directions
-3. illegal moves are masked
-4. the best legal move is selected
-5. the selected move is sent back to the C++ game engine
-
-This keeps the neural-network player inside the rules of the game.
-
----
-
-## Planned Modes
-
-The project will include several modes.
-
-### Human vs Human
-
-Two players can play the game manually.
-
-### Human vs Neural Network
-
-A human player can play against the PyTorch model.
-
-### Neural Network vs Neural Network
-
-Two model-controlled players can play against each other.
-
-### Self-Play
-
-The model can generate games by playing against itself.  
-These games can later be used as training data.
-
----
-
-## Model
-
-The first model will be a simple fully connected neural network.
-
-Input:
-
-```text
-board tensor
-```
-
-Output:
-
-```text
-8 move scores
-```
-
-Example architecture:
-
-```text
-Flatten
-Linear
-ReLU
-Linear
-ReLU
-Linear
-Output scores
-```
-
-This model is intentionally simple, because the first goal is to build a clear and working machine-learning pipeline.
-
-A convolutional neural network may be added later, because the board has a grid structure.
-
----
-
-## Training
-
-At the beginning, the model can be trained using games generated by simple players.
-
-Possible data sources:
-
-- random player games
-- rule-based player games
-- self-play games
-- human-played games
-
-Each training example contains:
-
-```text
-board state -> selected move
-```
-
-The model can be trained using standard PyTorch tools:
-
-- `torch`
-- `torch.nn`
-- `Dataset`
-- `DataLoader`
-- `CrossEntropyLoss`
-- `Adam`
-
-This makes the training process similar to the PyTorch exercises from class.
-
----
-
-## Suggested Project Structure
+## Project Structure
 
 ```text
 paper-soccer-ai/
-│
-├── README.md
-├── main.py
-│
 ├── cpp/
-│   ├── game.cpp
-│   ├── game.hpp
-│   ├── board.cpp
-│   ├── board.hpp
-│   └── bindings.cpp
+│   ├── include/
+│   │   ├── direction.hpp
+│   │   ├── field.hpp
+│   │   ├── game.hpp
+│   │   └── types.hpp
+│   ├── src/
+│   │   ├── field.cpp
+│   │   ├── game.cpp
+│   │   └── main.cpp
+│   └── CMakeLists.txt
 │
 ├── python/
-│   ├── model.py
-│   ├── train.py
-│   ├── play.py
 │   ├── dataset.py
-│   └── evaluate.py
+│   ├── evaluation.py
+│   ├── generate_dataset.py
+│   ├── model.py
+│   ├── parse.py
+│   ├── play.py
+│   ├── search_bot.py
+│   ├── train.py
+│   ├── visualize_game.py
+│   └── web_server.py
 │
-└── saved_models/
-    └── model.pth
+├── README.md
+└── instruction.txt
 ```
 
-### `cpp/game.cpp` and `cpp/game.hpp`
+---
 
-Contain the main game logic.
+## What Each Part Does
 
-### `cpp/board.cpp` and `cpp/board.hpp`
+### C++ Files
 
-Contain the board representation, used edges, visited points, and move validation.
+`direction.hpp` defines the 8 possible move directions, direction masks and opposite directions.
 
-### `cpp/bindings.cpp`
+`types.hpp` stores shared type aliases used by the field and game logic.
 
-Contains the communication layer between C++ and Python.
+`field.hpp` and `field.cpp` build the board. They calculate vertices, borders, goals, neighbors and initially allowed directions.
 
-### `python/model.py`
+`game.hpp` and `game.cpp` contain the main game rules. They store the current player, ball position, used edges, visited points, winner detection, dead-end detection and saving the game state to `gamestate.txt`.
 
-Contains the PyTorch model.
+`main.cpp` is the main game program. It lets the user choose a side, choose a bot mode, play in the terminal or run the web mode. It also calls the Python bot when the AI has to move.
 
-### `python/train.py`
+`CMakeLists.txt` is used to build the C++ executable with CMake.
 
-Contains the training loop.
+### Python Files
 
-### `python/play.py`
+`parse.py` loads `cpp/gamestate.txt` and converts it into a Python `GameState` object. It also creates the tensor input used by the neural network.
 
-Allows playing against the model.
+`evaluation.py` contains the heuristic evaluation functions. It scores positions and moves using simple game logic.
 
-### `python/evaluate.py`
+`search_bot.py` contains the search-based bot. It clones game states, applies moves, checks terminal positions and uses negamax with alpha-beta pruning.
 
-Compares different players and model versions.
+`play.py` is called by the C++ program when the bot needs to move. It reads the current game state, chooses a move using heuristic, search or neural mode, and saves the chosen move into `move.txt`.
+
+`model.py` defines the neural network architecture and the function for choosing the best legal neural move.
+
+`generate_dataset.py` generates training samples by simulating games and using the search bot as an expert. It saves tensors such as states, targets, legal masks and best moves.
+
+`train.py` trains the neural network on the generated dataset. It splits the data into training and test parts, trains the model, evaluates it and saves the best model.
+
+`dataset.py` defines a small PyTorch dataset wrapper.
+
+`visualize_game.py` creates a static `board.html` visualization from the current game state.
+
+`web_server.py` starts a local web server. It shows the board in the browser, refreshes the game state and lets the human player choose legal moves by clicking.
 
 ---
 
-## Technologies
+## Training Explanation
 
-The project will use:
+The training pipeline uses tensors saved by `generate_dataset.py`:
 
-- C++
-- Python
-- PyTorch
-- NumPy
-- Matplotlib, optional
-- Git
+```text
+states.pt       -> board states
+ targets.pt      -> target move scores
+legal_masks.pt  -> which moves are legal
+best_moves.pt   -> best move index for each state
+```
 
-C++ will be used for the game engine.  
-Python and PyTorch will be used for the machine-learning part.
+In `train.py`, these tensors are combined into one dataset:
+
+```python
+dataset = TensorDataset(states, targets, legal_masks, best_moves)
+```
+
+Then the dataset is split into training and testing data:
+
+```python
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+```
+
+This means:
+
+- `80%` of all samples are used for training
+- `20%` of all samples are used for testing
+
+For example, if the dataset has `10000` samples:
+
+```text
+train_size = 8000
+test_size = 2000
+```
+
+The test set is not used for learning. It is used only to check if the model works well on positions it did not train on.
+
+The model is saved when the test top-3 accuracy improves:
+
+```text
+python/saved_models/policy_model_v2.pth
+```
+
+The training history is saved to:
+
+```text
+python/saved_models/training_history_v2.csv
+```
 
 ---
 
-## Expected Result
+## Important Dataset Note
 
-The expected result is a working Paper Soccer game with a basic neural-network player.
+The heavy dataset files are not included in the repository. They can be generated again when needed.
 
-The final version should be able to:
+At the moment, `generate_dataset.py` saves data into:
 
-- simulate a complete game
-- check legal and illegal moves
-- convert the board into a tensor
-- run a forward pass through a PyTorch model
-- train the model on generated data
-- allow a human to play against the model
-- allow model-vs-model games
-- save and load trained models
+```text
+python/data/
+```
+
+and `train.py` expects data in:
+
+```text
+python/data/
+```
+
+---
+
+## How to Run
+
+### 1. Create Python Environment
+
+From the project root:
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Install needed packages:
+
+```bash
+pip install torch
+```
+
+### 2. Build the C++ Game
+
+Go to the `cpp` folder:
+
+```bash
+cd cpp
+```
+
+Configure and build:
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+The executable should be created in:
+
+```text
+cpp/build/soccer.exe
+```
+
+### 3. Run the Terminal Game
+
+From the `cpp` folder:
+
+```bash
+./build/soccer.exe
+```
+
+Then choose:
+
+```text
+0 - Top
+1 - Bottom
+```
+
+and choose a bot:
+
+```text
+1 - heuristic
+2 - search
+3 - neural
+```
+
+Use the numpad-style controls to make moves.
+
+### 4. Run the Web Version
+
+Open two terminals.
+
+In the first terminal, start the Python web server from the project root:
+
+```bash
+python python/web_server.py
+```
+
+Then open:
+
+```text
+http://localhost:5000
+```
+
+In the second terminal, go to the C++ folder and run:
+
+```bash
+cd cpp
+./build/soccer.exe web
+```
+
+The board will be shown in the browser. When it is your turn, click one of the green legal move circles.
 
 ---
 
-## Future Improvements
+## How to Generate Data and Train the Neural Bot
 
-Possible future improvements:
+First make sure the C++ game created an initial `gamestate.txt`. You can run:
 
-- better board visualization
-- simple graphical interface
-- convolutional neural network model
-- stronger rule-based opponent
-- improved self-play training
-- position evaluation score
-- model comparison statistics
+```bash
+cd cpp
+./build/soccer.exe init
+```
+
+Then generate the dataset:
+
+```bash
+cd ..
+python python/generate_dataset.py
+```
+
+After that, make sure `train.py` reads from the same folder where the dataset was saved. Then run:
+
+```bash
+python python/train.py
+```
+
+After training, the model should be saved in:
+
+```text
+python/saved_models/policy_model_v2.pth
+```
+
+Then neural mode can load this model and use it during the game.
 
 ---
+
+## Notes
+
+The repository does not include large generated dataset files, because they are heavy and can be recreated.
+
+The project currently contains three levels of AI:
+
+```text
+heuristic -> simple hand-written logic
+search    -> stronger look-ahead bot
+neural    -> PyTorch policy model trained from generated examples
+```
+
+The main idea is to connect a clean C++ game engine with Python machine-learning tools and make the game playable both from the terminal and from a small local web interface.
 
 ## Authors
 
-Project created for the Applied Machine Learning course.
+Project created for the Applied Machine Learning course at AGH.
 
 Authors:
 
@@ -379,7 +430,3 @@ Authors:
 - Patryk Kuna
 
 ---
-
-## License
-
-This project is created for educational purposes.

@@ -2,4 +2,5 @@ build/
 .vscode/
 *.exe
 *.o
-gamestate.txt
+.venv/
+*.pt

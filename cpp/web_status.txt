@@ -1,1 +1,1 @@
-human
+gameover_Bottom

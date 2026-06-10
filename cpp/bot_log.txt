@@ -1,30 +1,24 @@
 Using state file: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\gamestate.txt
-Mode: neural
+Mode: heuristic
 
 Player: 0
 Vertices: 153
-Current vertex: 32
+Current vertex: 142
 Input size: 1531
 
-Legal moves count: 5
+Legal moves count: 7
 
 Legal moves and heuristic scores:
-2 right :  33 score: 2.05
-3 down-right :  44 score: 1.75
-4 down :  43 score: 1.75
-5 down-left :  42 score: 1.75
-6 left :  31 score: 2.05
+0 up :  131 score: 3.75
+2 right :  143 score: 4.0
+3 down-right :  151 score: -2.0
+4 down :  150 score: -2.0
+5 down-left :  149 score: -2.0
+6 left :  141 score: 4.0
+7 up-left :  130 score: 3.75
 
-Loaded model: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\python\saved_models\policy_model_v2.pth
 
-Neural predicted scores:
-2 right score: -0.2242
-3 down-right score: 0.9429
-4 down score: 1.3883
-5 down-left score: 1.5012
-6 left score: 0.5875
-
-Selected move: 5 down-left
-Score: 1.5012
+Selected move: 2 right
+Score: 4.0
 
 Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt

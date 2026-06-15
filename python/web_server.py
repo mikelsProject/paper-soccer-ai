@@ -254,7 +254,7 @@ html = """
             margin: 0;
             min-height: 100vh;
             background:
-                radial-gradient(circle at top, #233044 0, #10131a 45%, #08090d 100%);
+                radial-gradient(circle at top, #233044 0, #10131a 70%, #08090d 100%);
             color: #eeeeee;
             font-family: Arial, sans-serif;
         }
@@ -439,7 +439,7 @@ html = """
         <div class="header">
             <div>
                 <h1>Paper Soccer AI</h1>
-                <div class="subtitle">Play against heuristic, search or neural bot directly from the browser.</div>
+                <div class="subtitle">Play against neural bot, heuristic or search algorithm</div>
             </div>
         </div>
 
@@ -476,7 +476,7 @@ html = """
                     <div class="hint">
                         Thinking time only changes the search bot. Heuristic and neural modes are almost instant.
                         <br><br>
-                        During your turn, click the green target or the invisible area around it.
+                        During your turn, click the green target where you want to place the ball.
                     </div>
 
                     <div class="info" id="info"></div>

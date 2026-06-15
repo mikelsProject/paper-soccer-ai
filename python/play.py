@@ -41,7 +41,7 @@ def choose_heuristic(state):
     return move, score
 
 
-def choose_search(state, max_depth=8, time_limit=2.0): # depth is maximum = 8 for every layer maximum time is 3s
+def choose_search(state, max_depth=8, time_limit=2.0): # depth is maximum = 8 for every layer maximum time is 2s
     move, score = search_best_move_timed(
         state,
         max_depth=max_depth,

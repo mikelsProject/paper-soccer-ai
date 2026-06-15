@@ -112,10 +112,10 @@ def main():
 
         return
 
-    games_count = 1000
-    max_moves_per_game = 300
-    epsilon = 0.25 # 25% of the time we choose a random move instead of the best move
-    expert_depth = 3
+    games_count = 10000
+    max_moves_per_game = 400
+    epsilon = 0.30
+    expert_depth = 5
 
     states = []
     targets = []

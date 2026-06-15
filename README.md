@@ -160,6 +160,8 @@ paper-soccer-ai/
 │   ├── play.py
 │   ├── search_bot.py
 │   ├── train.py
+│   ├── evaluate_bots.py
+│   ├── plot_results.py
 │   └── web_server.py
 │
 ├── README.md
@@ -198,12 +200,15 @@ paper-soccer-ai/
 
 `generate_dataset.py` generates training samples by simulating games and using the search bot as an expert. It saves tensors such as states, targets, legal masks and best moves.
 
-`train.py` trains the neural network on the generated dataset. It splits the data into training and test parts, trains the model, evaluates it and saves the best model.
+`train.py` trains the neural network on the generated dataset. It splits the data into training and test parts, trains the model, evaluates it and saves the best model and training history.
+
+`evaluate_bots.py` runs bot-vs-bot tests, for example neural vs search or neural vs heuristic, and saves match results to CSV files.
+
+`plot_results.py` creates plots from the training history and bot evaluation results.
 
 `dataset.py` defines a small PyTorch dataset wrapper.
 
-
-`web_server.py` starts a local web server. It shows the board in the browser, refreshes the game state and lets the human player choose legal moves by clicking.
+`web_server.py` starts a local web server. It shows the board in the browser, refreshes the game state and lets the human player choose legal moves by clicking. The current web version also supports live bot-vs-bot matches.
 
 ---
 
@@ -213,7 +218,7 @@ The training pipeline uses tensors saved by `generate_dataset.py`:
 
 ```text
 states.pt       -> board states
- targets.pt      -> target move scores
+targets.pt      -> expert move scores
 legal_masks.pt  -> which moves are legal
 best_moves.pt   -> best move index for each state
 ```
@@ -227,25 +232,37 @@ dataset = TensorDataset(states, targets, legal_masks, best_moves)
 Then the dataset is split into training and testing data:
 
 ```python
-train_size = int(0.8 * len(dataset))
+train_size = int(0.9 * len(dataset))
 test_size = len(dataset) - train_size
 ```
 
 This means:
 
-- `80%` of all samples are used for training
-- `20%` of all samples are used for testing
+- `90%` of all samples are used for training
+- `10%` of all samples are used for testing
 
-For example, if the dataset has `10000` samples:
+The model is trained as a policy network. It receives a board state and outputs 8 move scores. Illegal moves are masked, so the network is evaluated only on legal directions.
+
+The final loss combines two parts:
 
 ```text
-train_size = 8000
-test_size = 2000
+soft target loss      -> learns from the full expert score distribution
+hard cross entropy    -> still encourages the exact best expert move
 ```
 
-The test set is not used for learning. It is used only to check if the model works well on positions it did not train on.
+This is useful because in Paper Soccer several moves can have similar search values. The soft target part allows the model to learn close alternatives instead of treating every non-best move as completely wrong.
 
-The model is saved when the test top-3 accuracy improves:
+The script also tracks:
+
+```text
+train loss
+test loss
+exact accuracy
+top-3 accuracy
+learning rate
+```
+
+The best model is saved when test accuracy improves:
 
 ```text
 python/saved_models/policy_model_v2.pth
@@ -257,7 +274,13 @@ The training history is saved to:
 python/saved_models/training_history_v2.csv
 ```
 
----
+### Training plots
+
+The plots below are generated from `training_history_v2.csv` using `plot_results.py`.
+
+![Training accuracy](python/plots/training_accuracy.png)
+
+![Training loss](python/plots/training_loss.png)
 
 ## Important dataset note
 
@@ -368,24 +391,28 @@ If port `8000` is blocked, the server may use:
 http://localhost:8080
 ```
 
-In the browser panel you can choose:
+In the browser panel there are two main parts:
 
 ```text
-Your side
-Bot mode
-Search max depth
-Search thinking time
+Human game  -> play manually against heuristic, search or neural bot
+Live match  -> watch bot-vs-bot games, for example neural vs search
 ```
 
-Then press:
+For human mode, choose your side, bot mode, search depth and search thinking time, then press:
 
 ```text
-Start new game
+Start human game
+```
+
+For live bot matches, choose the top bot, bottom bot and search settings, then press:
+
+```text
+Start live bot match
 ```
 
 The web server starts or restarts the C++ game automatically. The board is shown in the browser and refreshes during play. When it is your turn, click one of the green legal move circles.
 
-The search thinking time only affects the search bot. Heuristic and neural modes are almost instant.
+The search thinking time only affects the search bot. Heuristic and neural modes are almost instant. Live bot matches use a small random opening so that deterministic bots do not always repeat exactly the same game.
 
 ---
 
@@ -418,6 +445,34 @@ python/saved_models/policy_model_v2.pth
 ```
 
 Then neural mode can load this model and use it during the game.
+
+---
+
+## How to evaluate and plot results
+
+To run bot-vs-bot evaluation from the terminal:
+
+```bash
+python python/evaluate_bots.py --bot-a neural --bot-b search --games 10 --search-time 0.5 --search-depth 8 --opening-random 2
+```
+
+The results are saved in:
+
+```text
+python/evaluation_results/
+```
+
+To generate plots from training and evaluation files:
+
+```bash
+python python/plot_results.py
+```
+
+The generated plots are saved in:
+
+```text
+python/plots/
+```
 
 ---
 

@@ -1,1 +1,0 @@
-..\.venv\Scripts\python.exe: can't open file 'C:\\Users\\patry\\OneDrive\\Pulpit\\UNI\\sem4\\AppliedMachineLearning\\paper-soccer-ai\\python\\visualize_game.py': [Errno 2] No such file or directory

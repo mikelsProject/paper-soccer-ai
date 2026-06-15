@@ -1,0 +1,1 @@
+python python/evaluate_bots.py --bot-a neural --bot-b search --games 10 --search-time 0.5 --search-depth 8 --opening-random 2

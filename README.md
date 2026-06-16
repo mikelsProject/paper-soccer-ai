@@ -368,13 +368,15 @@ legal_masks.pt  -> which moves are legal
 best_moves.pt   -> best move index for each state
 ```
 
-In `train.py`, these tensors are combined into one dataset:
+In `train.py`, these tensors are loaded and combined into one PyTorch dataset:
 
 ```python
 dataset = TensorDataset(states, targets, legal_masks, best_moves)
 ```
 
-Then the dataset is split into training and testing data:
+Each training sample contains one board position, the expert score for every direction, the mask of legal moves and the best move selected by the expert search bot.
+
+The dataset is split into training and testing data:
 
 ```python
 train_size = int(0.9 * len(dataset))
@@ -383,10 +385,12 @@ test_size = len(dataset) - train_size
 
 This means:
 
-- `90%` of all samples are used for training
-- `10%` of all samples are used for testing
+* `90%` of all samples are used for training
+* `10%` of all samples are used for testing
 
-The model is trained as a policy network. It receives a board state and outputs 8 move scores. Illegal moves are masked, so the network is evaluated only on legal directions.
+The test set is not used for updating the model. It is used only to check how well the neural network works on positions that were not directly used during training.
+
+The model is trained as a policy network. It receives a board state and outputs 8 move scores, one for each possible direction. Illegal moves are masked before calculating the loss and accuracy, so the model is evaluated only on directions that are actually possible in the current position.
 
 The final loss combines two parts:
 
@@ -395,17 +399,63 @@ soft target loss      -> learns from the full expert score distribution
 hard cross entropy    -> still encourages the exact best expert move
 ```
 
-This is useful because in Paper Soccer several moves can have similar search values. The soft target part allows the model to learn close alternatives instead of treating every non-best move as completely wrong.
+The soft target loss uses the normalized expert scores from the search bot. This allows the neural network to learn not only the best move, but also the relative quality of other legal moves. This is useful because in Paper Soccer several moves can have similar search values.
 
-The script also tracks:
+The hard cross entropy part uses `best_moves.pt` and encourages the model to choose the same strongest move as the expert. This is important because during real gameplay the neural bot finally has to select one concrete move.
+
+In simplified form, the training objective is:
+
+```text
+loss = soft target part + hard best-move part
+```
+
+This makes the model learn both general move preferences and exact expert decisions.
+
+The optimizer used for training is AdamW:
+
+```python
+optimizer = torch.optim.AdamW(
+    model.parameters(),
+    lr=0.0002,
+    weight_decay=1.0e-4
+)
+```
+
+The learning rate controls how large the model updates are during training. A larger learning rate can train faster, but it may become unstable. A smaller learning rate is slower, but it can help the model fine-tune its weights more carefully.
+
+The training also uses this learning rate scheduler:
+
+```python
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer,
+    mode="max",
+    factor=0.5,
+    patience=50,
+    min_lr=1.0e-6
+)
+```
+
+This scheduler watches the test accuracy. If the test accuracy does not improve for several epochs, the learning rate is reduced by multiplying it by `0.5`. For example, the learning rate can change like this:
+
+```text
+0.0002 -> 0.0001 -> 0.00005 -> 0.000025
+```
+
+This helps the model train quickly at the beginning and then make smaller, more precise updates later on.
+
+During training, the script tracks:
 
 ```text
 train loss
 test loss
-exact accuracy
-top-3 accuracy
+train accuracy
+test accuracy
+train top-3 accuracy
+test top-3 accuracy
 learning rate
 ```
+
+Exact accuracy checks if the model selected exactly the same best move as the expert. Top-3 accuracy checks if the expert move was among the three highest-scored neural moves. Top-3 accuracy is useful because some Paper Soccer positions have several reasonable moves with similar value.
 
 The best model is saved when test accuracy improves:
 
@@ -413,11 +463,20 @@ The best model is saved when test accuracy improves:
 python/saved_models/policy_model_v3.pth
 ```
 
+The final model from the last epoch is saved separately:
+
+```text
+python/saved_models/policy_model_v3_final.pth
+```
+
 The training history is saved to:
 
 ```text
 python/saved_models/training_history_v3.csv
 ```
+
+This history is later used by `plot_results.py` to generate the training accuracy, training loss and learning rate plots.
+
 
 ### Training plots
 

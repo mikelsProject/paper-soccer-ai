@@ -146,7 +146,7 @@ def save_game_lengths(results_path, output_dir):
 def main():
     root = project_root()
 
-    history_path = root / "python" / "saved_models" / "training_history_v2.csv"
+    history_path = root / "python" / "saved_models" / "training_history_v3.csv"
     results_path = root / "python" / "evaluation_results" / "bot_match_results.csv"
     output_dir = root / "python" / "plots"
 

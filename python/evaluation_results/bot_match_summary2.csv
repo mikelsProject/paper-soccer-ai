@@ -1,0 +1,7 @@
+metric,value
+games,1000
+average_moves,80.64
+wins_heuristic,552
+wins_neural,448
+wins_Bottom,510
+wins_Top,490

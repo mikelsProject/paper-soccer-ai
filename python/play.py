@@ -52,7 +52,7 @@ def choose_search(state, max_depth=8, time_limit=2.0): # depth is maximum = 8 fo
 
 
 def choose_neural(state):
-    model_path = project_root() / "python" / "saved_models" / "policy_model_v2.pth"
+    model_path = project_root() / "python" / "saved_models" / "policy_model_v3.pth"
 
     model = PaperSoccerNet(input_size=state.input_size)
 

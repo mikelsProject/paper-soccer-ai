@@ -296,7 +296,7 @@ def start_live_match(settings):
     live_neural_player = None
 
     if top_bot == "neural" or bottom_bot == "neural":
-        model_path = python_dir() / "saved_models" / "policy_model_v2.pth"
+        model_path = python_dir() / "saved_models" / "policy_model_v3.pth"
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         live_neural_player = NeuralPlayer(model_path, live_state.input_size, device)
 

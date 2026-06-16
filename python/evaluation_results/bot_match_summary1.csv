@@ -1,0 +1,7 @@
+metric,value
+games,50
+average_moves,63.96
+wins_neural,12
+wins_search,38
+wins_Bottom,25
+wins_Top,25

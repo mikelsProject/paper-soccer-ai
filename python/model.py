@@ -7,8 +7,13 @@ class PaperSoccerNet(nn.Module):
         super().__init__()
 
         self.model = nn.Sequential(
-            nn.Linear(input_size, 512),
+            nn.Linear(input_size, 1024),
             nn.ReLU(),
+            nn.Dropout(0.10),
+
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+            nn.Dropout(0.10),
 
             nn.Linear(512, 256),
             nn.ReLU(),

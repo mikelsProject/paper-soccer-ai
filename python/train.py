@@ -20,7 +20,7 @@ def soft_target_loss(outputs, targets, legal_masks): # trains the model to match
     masked_targets = targets.clone()
     masked_targets[~legal_masks] = -1.0e4 # illegal target moves should have almost zero probability
 
-    temperature = 0.7 # smaller value makes the best moves more important, but still keeps close alternatives
+    temperature = 0.5 # smaller values makes the best moves more important, but still keeps close alternatives
 
     target_probs = torch.softmax(masked_targets / temperature, dim=1) # converting expert scores into probabilities
     log_probs = F.log_softmax(masked_outputs, dim=1) # converting model outputs into log probabilities
@@ -42,7 +42,7 @@ def combined_loss(outputs, targets, legal_masks, best_moves): # combines soft sc
     soft = soft_target_loss(outputs, targets, legal_masks) # learns from all expert scores, not only one move
     hard = masked_cross_entropy_loss(outputs, best_moves, legal_masks) # still keeps some pressure on the exact best move
 
-    loss = 0.80 * soft + 0.20 * hard
+    loss = 0.70 * soft + 0.30 * hard
 
     return loss
 
@@ -240,7 +240,7 @@ def main():
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=1024,
+        batch_size=512,
         shuffle=True,
         num_workers=num_workers,
         pin_memory=pin_memory,
@@ -249,7 +249,7 @@ def main():
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=1024,
+        batch_size=512,
         shuffle=False,
         num_workers=num_workers,
         pin_memory=pin_memory,
@@ -260,7 +260,7 @@ def main():
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
-        lr=0.0003,
+        lr=0.0002,
         weight_decay=1.0e-4
     )
 
@@ -268,19 +268,20 @@ def main():
         optimizer,
         mode="max",
         factor=0.5,
-        patience=15
+        patience=35,
+        min_lr=1.0e-6
     )
 
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
 
-    epochs = 300
+    epochs = 500
 
     best_test_acc = 0.0
     best_test_top3 = 0.0
     best_test_loss = 1.0e9
 
-    best_model_path = model_dir / "policy_model_v2.pth"
-    final_model_path = model_dir / "policy_model_v2_final.pth"
+    best_model_path = model_dir / "policy_model_v3.pth"
+    final_model_path = model_dir / "policy_model_v3_final.pth"
     history = []
 
     for epoch in range(epochs):
@@ -345,7 +346,7 @@ def main():
 
     torch.save(model.state_dict(), final_model_path)
 
-    history_path = model_dir / "training_history_v2.csv" # saving the training history so we can plot it
+    history_path = model_dir / "training_history_v3.csv" # saving the training history so I can plot it
     with open(history_path, "w") as file:
         file.write("epoch,lr,train_loss,train_acc,train_top3,test_loss,test_acc,test_top3,best_test_acc\n")
 

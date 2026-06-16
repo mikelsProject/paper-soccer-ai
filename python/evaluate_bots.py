@@ -344,7 +344,7 @@ def main():
     root = project_root()
 
     if args.model_path is None:
-        model_path = root / "python" / "saved_models" / "policy_model_v2.pth"
+        model_path = root / "python" / "saved_models" / "policy_model_v3.pth"
     else:
         model_path = Path(args.model_path)
 
@@ -379,7 +379,7 @@ def main():
 
     if args.games > 1 and args.opening_random == 0:
         print()
-        print("Warning: no random opening moves, so all games will be the same")
+        print("Warning: no random opening moves, all games might be the same")
 
     results = []
 

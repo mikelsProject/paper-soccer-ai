@@ -1,1 +1,5 @@
-python python/evaluate_bots.py --bot-a neural --bot-b search --games 10 --search-time 0.5 --search-depth 8 --opening-random 2
+python python/evaluate_bots.py --bot-a neural --bot-b search --games 50 --search-time 0.02 --search-depth 8 --opening-random 3
+
+python python/evaluate_bots.py --bot-a neural --bot-b heuristic --games 1000 --opening-random 4
+
+python python/evaluate_bots.py --bot-a heuristic --bot-b search --games 50 --search-time 0.02 --search-depth 8 --opening-random 3

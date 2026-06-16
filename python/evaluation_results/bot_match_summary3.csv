@@ -1,0 +1,7 @@
+metric,value
+games,50
+average_moves,86.94
+wins_heuristic,11
+wins_search,39
+wins_Bottom,24
+wins_Top,26

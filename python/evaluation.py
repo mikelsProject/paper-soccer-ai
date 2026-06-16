@@ -43,7 +43,7 @@ def vertex_y(state, vertex):
     return (vertex - goal_width) // width
 
 
-def goal_progress(state, vertex): # win conditions
+def goal_progress(state, vertex): # towards goal
     player = state.player
 
     if player == 0:
@@ -77,16 +77,15 @@ def evaluate_vertex(state, vertex):
 
     progress = goal_progress(state, vertex)
     mobility = mobility_score(state, vertex)
-    extra = state.extra_turn[vertex].item()
 
     trap_penalty = 0.0
 
     if mobility == 0: # adding some penalty if the move leads to a trapped position
         trap_penalty = 5.0
     elif mobility <= 0.125:
-        trap_penalty = 1.5
+        trap_penalty = 3.0
 
-    score = 3.0 * progress + 1.0 * mobility + 0.8 * extra - trap_penalty # equation for the score
+    score = 5.0 * progress + (2.0 * mobility) - trap_penalty # equation for the score
 
     return score
 
@@ -102,13 +101,13 @@ def evaluate_move(state, move):
     return evaluate_vertex(state, next_vertex)
 
 
-def best_heuristic_move(state): # this function return the best move and its score
+def best_heuristic_move(state): # this function returns the best move and its score
     current = state.current_vertex
 
     best_move = None
     best_score = -1.0e9
 
-    for move in range(8): # 8 loops of max depth
+    for move in range(8): # checking all possible moves
         if not state.allowed[current, move].bool():
             continue
 

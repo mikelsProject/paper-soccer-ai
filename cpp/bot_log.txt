@@ -1,0 +1,65 @@
+Using state file: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\gamestate.txt
+Mode: search
+
+Player: 0
+Vertices: 153
+Current vertex: 65
+Input size: 1531
+
+Legal moves count: 7
+
+Legal moves and heuristic scores:
+0 up :  54 score: 3.6667
+1 up-right :  55 score: 3.6667
+2 right :  66 score: 4.0833
+4 down :  76 score: 3.75
+5 down-left :  75 score: 4.5
+6 left :  64 score: 4.0833
+7 up-left :  53 score: 3.6667
+
+
+Searching depth: 1
+search 0 up value: -5.0833
+search 1 up-right value: -5.0833
+search 7 up-left value: -5.0833
+search 2 right value: -4.6667
+search 6 left value: -4.6667
+search 5 down-left value: -4.25
+search 4 down value: 3.5
+Completed depth: 1 best move: 4 value: 3.5 time: 0.0 s
+
+Searching depth: 2
+search 0 up value: 3.0
+search 1 up-right value: 3.0
+search 7 up-left value: 3.0
+search 2 right value: -3.5
+search 6 left value: -3.5
+search 5 down-left value: -3.5
+search 4 down value: -3.8333
+Completed depth: 2 best move: 0 value: 3.0 time: 0.02 s
+
+Searching depth: 3
+search 0 up value: -5.0833
+search 1 up-right value: -5.0833
+search 7 up-left value: -5.0833
+search 2 right value: -4.6667
+search 6 left value: -4.6667
+search 5 down-left value: -4.25
+search 4 down value: -3.3333
+Completed depth: 3 best move: 4 value: -3.3333 time: 0.13 s
+
+Searching depth: 4
+search 0 up value: 2.1667
+search 1 up-right value: 2.1667
+search 7 up-left value: 2.1667
+search 2 right value: 3.3333
+search 6 left value: 3.3333
+search 5 down-left value: -3.0
+search 4 down value: -3.8333
+time limit reached after depth: 4
+
+Selected move: 4 down
+Score: -3.3333
+
+Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt
+^C

@@ -233,66 +233,24 @@ If the same state appears again, it is skipped. This keeps the dataset cleaner a
 
 ### Training the neural bot
 
-The neural network is trained in `train.py` as a policy model. It receives the board state and predicts 8 move scores.
+The neural bot was trained to imitate the search-based expert. Instead of manually defining all strategic rules, the model learns move preferences from many generated board positions.
 
-The training pipeline uses four tensors saved by `generate_dataset.py`:
-
-```text
-states.pt       -> board states
-targets.pt      -> normalized expert scores
-legal_masks.pt  -> legal move masks
-best_moves.pt   -> best expert moves
-```
-
-The data is split into training and testing parts:
+The training is based on two targets:
 
 ```text
-90% -> training set
-10% -> test set
+expert score distribution -> teaches how good each legal move is
+best expert move          -> teaches the strongest move directly
 ```
 
-The loss combines two ideas:
+Because of this, the model is not trained only as a simple classifier. It also learns the relative quality of alternative moves. This is useful in Paper Soccer, where several legal moves can often be close in value.
 
-```text
-soft target loss   -> learns the full expert score distribution
-hard CE loss       -> encourages the exact best expert move
-```
+Illegal moves are masked during training and evaluation. This means the model is not rewarded or punished for impossible moves, and during gameplay it can only choose from legal directions.
 
-The soft target loss is useful because in Paper Soccer several moves can have similar value. A purely hard classification loss would treat every non-best move as completely wrong, even if another move is almost as good according to the expert search.
+The model was trained for a longer 500 epochs run on the server. The best saved model resuls are shown in the section below.
 
-The hard cross entropy part is still useful because the bot finally has to choose one concrete move during gameplay.
+The exact accuracy shows how often the model selected the same best move as the search expert. The top-3 accuracy shows how often the expert move was among the three highest neural scores. The high top-3 accuracy suggests that the model learned useful move preferences, even when its first choice was not always exactly the same as the expert.
 
-During training, the script tracks:
 
-```text
-train loss
-test loss
-exact accuracy
-top-3 accuracy
-learning rate
-```
-
-Exact accuracy checks if the neural network selected exactly the same move as the expert. Top-3 accuracy checks if the expert move is among the three highest neural scores. Top-3 accuracy is useful here because many board positions have several reasonable moves.
-
-The best trained model is saved as:
-
-```text
-python/saved_models/policy_model_v3.pth
-```
-
-The final model is also saved separately:
-
-```text
-python/saved_models/policy_model_v3_final.pth
-```
-
-The training history is saved as:
-
-```text
-python/saved_models/training_history_v3.csv
-```
-
-This history is later used to generate the training plots which are shown below.
 
 ### Final training results
 

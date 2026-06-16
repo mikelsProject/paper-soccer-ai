@@ -155,13 +155,17 @@ bool run_python_bot(const std::string& botMode, int maxDepth, double timeLimit)
 {
     std::ostringstream command;
 
-    command << "cmd /C \"..\\.venv\\Scripts\\python.exe ..\\python\\play.py " << botMode;
+#ifdef _WIN32
+    command << "\"..\\.venv\\Scripts\\python.exe\" \"..\\python\\play.py\" " << botMode;
+#else
+    command << "\"../../.venv/bin/python\" \"../python/play.py\" " << botMode;
+#endif
 
     if (botMode == "search") {
         command << " " << maxDepth << " " << timeLimit;
     }
 
-    command << " > bot_log.txt 2>&1\"";
+    command << " > bot_log.txt 2>&1";
 
     int result = std::system(command.str().c_str());
 

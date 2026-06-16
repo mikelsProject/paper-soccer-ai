@@ -3,63 +3,78 @@ Mode: search
 
 Player: 0
 Vertices: 153
-Current vertex: 65
+Current vertex: 76
 Input size: 1531
 
-Legal moves count: 7
+Legal moves count: 8
 
 Legal moves and heuristic scores:
-0 up :  54 score: 3.6667
-1 up-right :  55 score: 3.6667
-2 right :  66 score: 4.0833
-4 down :  76 score: 3.75
-5 down-left :  75 score: 4.5
-6 left :  64 score: 4.0833
-7 up-left :  53 score: 3.6667
+0 up :  65 score: 4.0833
+1 up-right :  66 score: 4.0833
+2 right :  77 score: 4.5
+3 down-right :  88 score: 4.9167
+4 down :  87 score: 4.9167
+5 down-left :  86 score: 4.9167
+6 left :  75 score: 4.5
+7 up-left :  64 score: 4.0833
 
 
 Searching depth: 1
-search 0 up value: -5.0833
-search 1 up-right value: -5.0833
-search 7 up-left value: -5.0833
-search 2 right value: -4.6667
-search 6 left value: -4.6667
-search 5 down-left value: -4.25
-search 4 down value: 3.5
-Completed depth: 1 best move: 4 value: 3.5 time: 0.0 s
+search 0 up value: -4.6667
+search 1 up-right value: -4.6667
+search 7 up-left value: -4.6667
+search 2 right value: -4.25
+search 6 left value: -4.25
+search 3 down-right value: -3.8333
+search 4 down value: -3.8333
+search 5 down-left value: -3.8333
+Completed depth: 1 best move: 3 value: -3.8333 time: 0.0 s
 
 Searching depth: 2
-search 0 up value: 3.0
-search 1 up-right value: 3.0
-search 7 up-left value: 3.0
-search 2 right value: -3.5
-search 6 left value: -3.5
-search 5 down-left value: -3.5
-search 4 down value: -3.8333
-Completed depth: 2 best move: 0 value: 3.0 time: 0.02 s
+search 0 up value: 3.4167
+search 1 up-right value: 3.4167
+search 7 up-left value: 3.4167
+search 2 right value: 3.8333
+search 6 left value: 3.8333
+search 3 down-right value: 4.25
+search 4 down value: 4.25
+search 5 down-left value: 4.25
+Completed depth: 2 best move: 3 value: 4.25 time: 0.02 s
 
 Searching depth: 3
-search 0 up value: -5.0833
-search 1 up-right value: -5.0833
-search 7 up-left value: -5.0833
-search 2 right value: -4.6667
-search 6 left value: -4.6667
-search 5 down-left value: -4.25
-search 4 down value: -3.3333
-Completed depth: 3 best move: 4 value: -3.3333 time: 0.13 s
+search 0 up value: -4.6667
+search 1 up-right value: -4.6667
+search 7 up-left value: -4.6667
+search 2 right value: -4.25
+search 6 left value: -4.25
+search 3 down-right value: -3.8333
+search 4 down value: -3.0
+search 5 down-left value: -3.8333
+Completed depth: 3 best move: 4 value: -3.0 time: 0.17 s
 
 Searching depth: 4
-search 0 up value: 2.1667
-search 1 up-right value: 2.1667
-search 7 up-left value: 2.1667
-search 2 right value: 3.3333
-search 6 left value: 3.3333
-search 5 down-left value: -3.0
-search 4 down value: -3.8333
-time limit reached after depth: 4
+search 0 up value: 2.5833
+search 1 up-right value: 2.5833
+search 7 up-left value: 2.5833
+search 2 right value: 3.0
+search 6 left value: 3.0
+search 3 down-right value: 3.4167
+search 4 down value: 4.25
+search 5 down-left value: 3.4167
+Completed depth: 4 best move: 4 value: 4.25 time: 0.87 s
+
+Searching depth: 5
+search 0 up value: -4.6667
+search 1 up-right value: -4.6667
+search 7 up-left value: -4.6667
+search 2 right value: 2.5833
+search 6 left value: 2.5833
+search 3 down-right value: -2.1667
+search 4 down value: -2.1667
+search 5 down-left value: -2.1667
+time limit reached after depth: 5
 
 Selected move: 4 down
-Score: -3.3333
+Score: 4.25
 
 Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt
-^C

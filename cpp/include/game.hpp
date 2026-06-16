@@ -11,7 +11,7 @@
 class Game
 {
 public:
-    Game(int width, int height, int goalWidth);
+    Game(int& width, int& height, int& goalWidth);
 
     enum class Player : std::uint8_t
     {

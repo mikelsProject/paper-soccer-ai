@@ -190,7 +190,7 @@ def main():
     torch.save(best_moves, best_moves_path)
 
     print()
-    print("Dataset v2 generated")
+    print("Dataset v3 generated")
     print("States shape:", states.shape)
     print("Targets shape:", targets.shape)
     print("Legal masks shape:", legal_masks.shape)

@@ -158,7 +158,7 @@ bool run_python_bot(const std::string& botMode, int maxDepth, double timeLimit)
 #ifdef _WIN32
     command << "\"..\\.venv\\Scripts\\python.exe\" \"..\\python\\play.py\" " << botMode;
 #else
-    command << "\"../.venv/bin/python\" \"../python/play.py\" " << botMode;
+    command << "\"../../.venv/bin/python\" \"../python/play.py\" " << botMode;
 #endif
 
     if (botMode == "search") {

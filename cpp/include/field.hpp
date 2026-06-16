@@ -14,7 +14,7 @@
 class Field
 {
 public:
-    Field(int width, int height, int goalWidth);
+    Field(int& width, int& height, int& goalWidth);
     //const Positions& positions() ? 
 
     int width() const;
@@ -73,9 +73,9 @@ private:
     Positions m_pos;
 
 private:
-    static int validated_width(int width);
-    static int validated_height(int height);
-    static int validated_goal_width(int goalWidth, int validWidth); //assumes already valid width!
+    static int validated_width(int& width);
+    static int validated_height(int& height);
+    static int validated_goal_width(int& goalWidth, int validWidth); //assumes already valid width!
 
     static Positions calculate_positions(int width, int height, int goalWidth, int verticesCount);
 

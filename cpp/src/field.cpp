@@ -2,34 +2,37 @@
 
 #include <cassert>
 
-int Field::validated_width(int width)
+int Field::validated_width(int& width)
 {
     if(width >= 5 && width % 2 == 1)
         return width;
 
     std::cout << "width has to be an odd number, at least 5\n";
     std::cout << "width was set to default 9\n";
-    return 9;
+    width = 9;
+    return width;
 }
 
-int Field::validated_height(int height)
+int Field::validated_height(int& height)
 {
     if(height >= 3 && height % 2 == 1)
         return height;
 
     std::cout << "height has to be an odd number, at least 3\n";
     std::cout << "height was set to default 13\n";
-    return 13;
+    height = 13;
+    return height;
 }
 
-int Field::validated_goal_width(int goalWidth, int validWidth)
+int Field::validated_goal_width(int& goalWidth, int validWidth)
 {
     if(goalWidth >= 3 && goalWidth <= validWidth - 2 && goalWidth % 2 == 1)
         return goalWidth;
     
     std::cout << "goal width has to be an odd number, at least 3, smaller than width of the whole field\n";
     std::cout << "goal width was set to defualt 3\n";
-    return 3;
+    goalWidth = 3;
+    return goalWidth;
 }
 
 Field::Positions Field::calculate_positions(int width, int height, int goalWidth, int verticesCount)
@@ -64,7 +67,7 @@ Field::Positions Field::calculate_positions(int width, int height, int goalWidth
 }
 
 
-Field::Field(int width, int height, int goalWidth)
+Field::Field(int& width, int& height, int& goalWidth)
     :m_width(validated_width(width)), 
      m_height(validated_height(height)),
      m_goalWidth(validated_goal_width(goalWidth, m_width)),

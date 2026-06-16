@@ -25,7 +25,7 @@ void Game::initialize_extra_turn_vertices()
     m_extraTurnVertices[m_field.bottom_right_corner()] = false;
 }
 
-Game::Game(int width, int height, int goalWidth)
+Game::Game(int& width, int& height, int& goalWidth)
     : m_field(width, height, goalWidth)
     , m_gameOver(false)
     , m_winner(std::nullopt)

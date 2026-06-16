@@ -1,0 +1,7 @@
+sh: 1: cmd: not found
+Paper Soccer AI web game
+Human: Top
+Bot: search
+Search max depth: 8
+Search time limit: 2 s
+Bot failed

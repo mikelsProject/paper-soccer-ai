@@ -1360,48 +1360,38 @@ html = """
         }
 
         async function sendMove(move) {
+            console.log("click", {
+                move: move,
+                moveSending: moveSending,
+                latestStatus: latestData ? latestData.status : null,
+                latestBall: latestData ? latestData.ball : null,
+                latestPlayer: latestData ? latestData.player : null
+            });
+
             if (moveSending) {
+                console.log("ignored: moveSending is true");
                 return;
             }
 
             if (!latestData || latestData.status !== "human") {
+                console.log("ignored: not human status", latestData);
                 return;
             }
 
             moveSending = true;
 
-            const beforeBall = latestData.ball;
-            const beforePlayer = latestData.player;
-            const beforeLegalCount = latestData.legal_count;
+            try {
+                const result = await postJSON("/move", {move: move});
+                console.log("move result", result);
 
-            const result = await postJSON("/move", {move: move});
-
-            if (!result.ok) {
-                moveSending = false;
-                await loadBoard();
-                return;
-            }
-
-            for (let i = 0; i < 2; i++) {
-                await sleep(10);
-
-                const response = await fetch("/state");
-                const data = await response.json();
-
-                renderBoard(data);
-
-                const changed =
-                    data.ball !== beforeBall ||
-                    data.player !== beforePlayer ||
-                    data.legal_count !== beforeLegalCount ||
-                    data.status !== "human";
-
-                if (changed) {
-                    break;
+                if (!result.ok) {
+                    console.log("move rejected:", result.message);
                 }
+            } finally {
+                moveSending = false;
             }
 
-            moveSending = false;
+            await loadBoard();
         }
 
         function statusText(status) {

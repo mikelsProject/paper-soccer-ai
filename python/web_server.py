@@ -1382,8 +1382,8 @@ html = """
                 return;
             }
 
-            for (let i = 0; i < 18; i++) {
-                await sleep(40);
+            for (let i = 0; i < 2; i++) {
+                await sleep(10);
 
                 const response = await fetch("/state");
                 const data = await response.json();

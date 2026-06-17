@@ -29,7 +29,7 @@ current_settings = {
     "side": 1,
     "mode": "search",
     "depth": 8,
-    "time": 2.0
+    "time": 0.5
 }
 
 live_state = None
@@ -48,6 +48,10 @@ live_result_saved = False
 live_neural_player = None
 live_random_opening = 3
 live_rng = random.Random()
+
+edge_owners = {}
+last_allowed_snapshot = None
+last_player_snapshot = None
 
 live_settings = {
     "top_bot": "neural",
@@ -118,6 +122,57 @@ def find_executable():
     return None
 
 
+
+def edge_key(a, b):
+    a = int(a)
+    b = int(b)
+
+    if a < b:
+        return (a, b)
+
+    return (b, a)
+
+
+def reset_edge_tracking():
+    global edge_owners, last_allowed_snapshot, last_player_snapshot
+
+    edge_owners = {}
+    last_allowed_snapshot = None
+    last_player_snapshot = None
+
+
+def remember_edge_owner(from_vertex, to_vertex, player):
+    key = edge_key(from_vertex, to_vertex)
+
+    if key not in edge_owners:
+        edge_owners[key] = int(player)
+
+
+def learn_edge_owners_from_loaded_state(state):
+    global last_allowed_snapshot, last_player_snapshot
+
+    if last_allowed_snapshot is None:
+        last_allowed_snapshot = state.allowed.clone()
+        last_player_snapshot = int(state.player)
+        return
+
+    for v in range(state.vertices_count):
+        for d in range(8):
+            n = int(state.neighbours[v, d].item())
+
+            if n < 0:
+                continue
+
+            was_allowed = bool(last_allowed_snapshot[v, d].item())
+            is_allowed = bool(state.allowed[v, d].item())
+
+            if was_allowed and not is_allowed:
+                remember_edge_owner(v, n, last_player_snapshot)
+
+    last_allowed_snapshot = state.allowed.clone()
+    last_player_snapshot = int(state.player)
+
+
 def clean_game_files():
     names = [
         "web_move.txt",
@@ -181,6 +236,7 @@ def start_game(settings):
 
     stop_game()
     clean_game_files()
+    reset_edge_tracking()
 
     live_running = False
     live_finished = False
@@ -200,7 +256,7 @@ def start_game(settings):
         mode = "search"
 
     depth = int(settings.get("depth", 8))
-    thinking_time = float(settings.get("time", 2.0))
+    thinking_time = float(settings.get("time", 0.5))
 
     current_settings = {
         "side": side,
@@ -243,7 +299,12 @@ def apply_random_opening(state, moves_count):
             return True, 1 - state.player, moves_done
 
         move = live_rng.choice(legal)
+        from_vertex = state.current_vertex
+        to_vertex = int(state.neighbours[from_vertex, move].item())
+        owner = state.player
+
         finished, winner = apply_move(state, move)
+        remember_edge_owner(from_vertex, to_vertex, owner)
         moves_done += 1
 
         if finished:
@@ -260,6 +321,7 @@ def start_live_match(settings):
 
     stop_game()
     clean_game_files()
+    reset_edge_tracking()
 
     top_bot = str(settings.get("top_bot", "neural"))
     bottom_bot = str(settings.get("bottom_bot", "search"))
@@ -512,6 +574,7 @@ def update_live_match(force=False):
     target_vertex = int(live_state.neighbours[current_vertex, move].item())
 
     finished, winner = apply_move(live_state, move)
+    remember_edge_owner(current_vertex, target_vertex, current_player)
 
     live_moves += 1
     live_last_step = time.time()
@@ -554,6 +617,8 @@ def state_to_data(state, status, settings, active, message=""):
             x2, y2 = vertex_position(n)
             used = not bool(state.allowed[v, d].item())
 
+            owner = edge_owners.get(edge_key(v, n), None)
+
             edges.append({
                 "from": v,
                 "to": n,
@@ -561,7 +626,8 @@ def state_to_data(state, status, settings, active, message=""):
                 "y1": y1,
                 "x2": x2,
                 "y2": y2,
-                "used": used
+                "used": used,
+                "owner": owner
             })
 
     legal_moves = []
@@ -640,6 +706,7 @@ def get_human_state_data():
         }
 
     state = load_game_state(state_path)
+    learn_edge_owners_from_loaded_state(state)
 
     return state_to_data(
         state,
@@ -1008,8 +1075,9 @@ html = """
 
         .move-hit {
             cursor: pointer;
-            fill: transparent;
+            fill: rgba(34, 197, 94, 0.001);
             pointer-events: all;
+            touch-action: none;
         }
 
         .move-dot {
@@ -1041,25 +1109,15 @@ html = """
         }
 
         @media (max-width: 1180px) {
-            .page {
-                max-width: 760px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
             .layout {
                 grid-template-columns: minmax(0, 1fr);
-                justify-items: center;
             }
 
             .board-column,
             .board-card,
             .panel,
             .status-column {
-                width: 100%;
                 max-width: 720px;
-                margin-left: auto;
-                margin-right: auto;
             }
 
             .status-column .metric-grid {
@@ -1070,7 +1128,6 @@ html = """
         @media (max-width: 720px) {
             .page {
                 padding: 12px;
-                max-width: 100%;
             }
 
             h1 {
@@ -1124,7 +1181,7 @@ html = """
                     <input id="humanDepth" type="number" min="1" max="12" value="8">
 
                     <label>Search thinking time [s]</label>
-                    <input id="humanTime" type="number" min="0.1" max="30" step="0.1" value="2.0">
+                    <input id="humanTime" type="number" min="0.1" max="30" step="0.1" value="0.5">
 
                     <button onclick="newGame()">Start human game</button>
 
@@ -1295,8 +1352,56 @@ html = """
             await loadBoard();
         }
 
+        let latestData = null;
+        let moveSending = false;
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         async function sendMove(move) {
-            await postJSON("/move", {move: move});
+            if (moveSending) {
+                return;
+            }
+
+            if (!latestData || latestData.status !== "human") {
+                return;
+            }
+
+            moveSending = true;
+
+            const beforeBall = latestData.ball;
+            const beforePlayer = latestData.player;
+            const beforeLegalCount = latestData.legal_count;
+
+            const result = await postJSON("/move", {move: move});
+
+            if (!result.ok) {
+                moveSending = false;
+                await loadBoard();
+                return;
+            }
+
+            for (let i = 0; i < 18; i++) {
+                await sleep(40);
+
+                const response = await fetch("/state");
+                const data = await response.json();
+
+                renderBoard(data);
+
+                const changed =
+                    data.ball !== beforeBall ||
+                    data.player !== beforePlayer ||
+                    data.legal_count !== beforeLegalCount ||
+                    data.status !== "human";
+
+                if (changed) {
+                    break;
+                }
+            }
+
+            moveSending = false;
         }
 
         function statusText(status) {
@@ -1338,7 +1443,7 @@ html = """
                 const hit = el("circle", {
                     cx: px(m.x),
                     cy: py(m.y),
-                    r: 34,
+                    r: 26,
                     class: "move-hit"
                 });
 
@@ -1353,7 +1458,13 @@ html = """
                 });
 
                 if (data.status === "human") {
-                    g.onclick = () => sendMove(m.move);
+                    const handleMove = (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        sendMove(m.move);
+                    };
+
+                    hit.onpointerdown = handleMove;
                 }
 
                 g.appendChild(hit);
@@ -1415,9 +1526,8 @@ html = """
             return html;
         }
 
-        async function loadBoard() {
-            const response = await fetch("/state");
-            const data = await response.json();
+        function renderBoard(data) {
+            latestData = data;
 
             const svg = document.getElementById("board");
             svg.innerHTML = "";
@@ -1434,12 +1544,24 @@ html = """
                     continue;
                 }
 
+                let strokeColor = "#c8ccd2";
+
+                if (edge.used) {
+                    if (edge.owner === 0) {
+                        strokeColor = "#7c3aed";
+                    } else if (edge.owner === 1) {
+                        strokeColor = "#f97316";
+                    } else {
+                        strokeColor = "#111827";
+                    }
+                }
+
                 svg.appendChild(el("line", {
                     x1: px(edge.x1),
                     y1: py(edge.y1),
                     x2: px(edge.x2),
                     y2: py(edge.y2),
-                    stroke: edge.used ? "#111827" : "#c8ccd2",
+                    stroke: strokeColor,
                     "stroke-width": edge.used ? 4 : 1.2,
                     "stroke-linecap": "round"
                 }));
@@ -1472,8 +1594,15 @@ html = """
             document.getElementById("info").innerHTML = makeInfo(data);
         }
 
+        async function loadBoard() {
+            const response = await fetch("/state");
+            const data = await response.json();
+
+            renderBoard(data);
+        }
+
         loadBoard();
-        setInterval(loadBoard, 350);
+        setInterval(loadBoard, 180);
     </script>
 </body>
 
@@ -1555,7 +1684,21 @@ class Handler(BaseHTTPRequestHandler):
 
         if self.path == "/move":
             move = int(data["move"])
-            cpp_path("web_move.txt").write_text(str(move))
+            move_path = cpp_path("web_move.txt")
+
+            if active_mode != "human":
+                self.send_json({"ok": False, "ignored": True, "message": "Not in human game mode."})
+                return
+
+            if read_status() != "human":
+                self.send_json({"ok": False, "ignored": True, "message": "It is not the human turn."})
+                return
+
+            if move_path.exists():
+                self.send_json({"ok": False, "ignored": True, "message": "Move already pending."})
+                return
+
+            move_path.write_text(str(move))
             self.send_json({"ok": True})
             return
 

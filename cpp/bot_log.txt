@@ -1,80 +1,49 @@
-Using state file: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\gamestate.txt
-Mode: search
-
-Player: 0
-Vertices: 153
-Current vertex: 76
-Input size: 1531
-
-Legal moves count: 8
-
-Legal moves and heuristic scores:
-0 up :  65 score: 4.0833
-1 up-right :  66 score: 4.0833
-2 right :  77 score: 4.5
-3 down-right :  88 score: 4.9167
-4 down :  87 score: 4.9167
-5 down-left :  86 score: 4.9167
-6 left :  75 score: 4.5
-7 up-left :  64 score: 4.0833
-
-
-Searching depth: 1
-search 0 up value: -4.6667
-search 1 up-right value: -4.6667
-search 7 up-left value: -4.6667
-search 2 right value: -4.25
-search 6 left value: -4.25
-search 3 down-right value: -3.8333
-search 4 down value: -3.8333
-search 5 down-left value: -3.8333
-Completed depth: 1 best move: 3 value: -3.8333 time: 0.0 s
-
-Searching depth: 2
-search 0 up value: 3.4167
-search 1 up-right value: 3.4167
-search 7 up-left value: 3.4167
-search 2 right value: 3.8333
-search 6 left value: 3.8333
-search 3 down-right value: 4.25
-search 4 down value: 4.25
-search 5 down-left value: 4.25
-Completed depth: 2 best move: 3 value: 4.25 time: 0.02 s
-
-Searching depth: 3
-search 0 up value: -4.6667
-search 1 up-right value: -4.6667
-search 7 up-left value: -4.6667
-search 2 right value: -4.25
-search 6 left value: -4.25
-search 3 down-right value: -3.8333
-search 4 down value: -3.0
-search 5 down-left value: -3.8333
-Completed depth: 3 best move: 4 value: -3.0 time: 0.17 s
-
-Searching depth: 4
-search 0 up value: 2.5833
-search 1 up-right value: 2.5833
-search 7 up-left value: 2.5833
-search 2 right value: 3.0
-search 6 left value: 3.0
-search 3 down-right value: 3.4167
-search 4 down value: 4.25
-search 5 down-left value: 3.4167
-Completed depth: 4 best move: 4 value: 4.25 time: 0.87 s
-
-Searching depth: 5
-search 0 up value: -4.6667
-search 1 up-right value: -4.6667
-search 7 up-left value: -4.6667
-search 2 right value: 2.5833
-search 6 left value: 2.5833
-search 3 down-right value: -2.1667
-search 4 down value: -2.1667
-search 5 down-left value: -2.1667
-time limit reached after depth: 5
-
-Selected move: 4 down
-Score: 4.25
-
-Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt
+Traceback (most recent call last):
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\python\play.py", line 4, in <module>
+    import torch
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\__init__.py", line 2247, in <module>
+    from torch import _VF as _VF, functional as functional  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\functional.py", line 8, in <module>
+    import torch.nn.functional as F
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\nn\__init__.py", line 8, in <module>
+    from torch.nn.modules import *  # usort: skip # noqa: F403
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\nn\modules\__init__.py", line 157, in <module>
+    from .rnn import GRU, GRUCell, LSTM, LSTMCell, RNN, RNNBase, RNNCell, RNNCellBase
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\nn\modules\rnn.py", line 486, in <module>
+    class RNN(RNNBase):
+    ...<325 lines>...
+            return output, self.permute_hidden(hidden, unsorted_indices)
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\nn\modules\rnn.py", line 657, in RNN
+    @torch._jit_internal._overload_method  # noqa: F811
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\_jit_internal.py", line 1102, in _overload_method
+    _check_overload_body(func)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\_jit_internal.py", line 1016, in _check_overload_body
+    parsed_def = parse_def(func)
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\_sources.py", line 121, in parse_def
+    sourcelines, file_lineno, filename = get_source_lines_and_file(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        fn, ErrorReport.call_stack()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\.venv\Lib\site-packages\torch\_sources.py", line 24, in get_source_lines_and_file
+    sourcelines, file_lineno = inspect.getsourcelines(obj)
+                               ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\patry\AppData\Local\Python\pythoncore-3.14-64\Lib\inspect.py", line 1143, in getsourcelines
+    lines, lnum = findsource(object)
+                  ~~~~~~~~~~^^^^^^^^
+  File "C:\Users\patry\AppData\Local\Python\pythoncore-3.14-64\Lib\inspect.py", line 972, in findsource
+    lines = linecache.getlines(file, module.__dict__)
+  File "C:\Users\patry\AppData\Local\Python\pythoncore-3.14-64\Lib\linecache.py", line 41, in getlines
+    return updatecache(filename, module_globals)
+  File "C:\Users\patry\AppData\Local\Python\pythoncore-3.14-64\Lib\linecache.py", line 187, in updatecache
+    with tokenize.open(fullname) as fp:
+         ~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\patry\AppData\Local\Python\pythoncore-3.14-64\Lib\tokenize.py", line 461, in open
+    buffer = _builtin_open(filename, 'rb')
+KeyboardInterrupt
+^C

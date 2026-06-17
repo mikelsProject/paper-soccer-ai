@@ -1,0 +1,3 @@
+game,top_bot,bottom_bot,winner_side,winner_bot,moves,reason,final_player,final_vertex,opening_random,top_time,bottom_time,seed
+1,neural,search,Bottom,search,121,live_match,Top,82,3,0.0738,75.0443,
+2,neural,neural,Bottom,neural,40,live_match,Bottom,1,3,0.017,0.028,

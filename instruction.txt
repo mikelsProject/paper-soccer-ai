@@ -1,4 +1,37 @@
+1. Clone the repository
+
+Warning!
+The way the project is set up for now
+requires that python .venv would be:
+-on windows: Inside the project directory (so parallel to python, cpp directories)
+-on linux: Parallel to the project directory
+
+To change the path modife this section of code in main.cpp file:
+
+    bool run_python_bot(const std::string& botMode, int maxDepth, double timeLimit)
+    {
+        std::ostringstream command;
+
+    #ifdef _WIN32
+        command << "\"..\\.venv\\Scripts\\python.exe\" \"..\\python\\play.py\" " << botMode;
+    #else
+        command << "\"../../.venv/bin/python\" \"../python/play.py\" " << botMode;
+    #endif
+    ...
+    }
+
+Sorry for that, we'll hopefully fix that after the exams this semester
+
+
+2. Go to the cpp directory and run the following commands from command line
+    2.1 On linux:
+cmake --build build
+./build/soccer
+    
+    2.2: On windows
+cmake --build build
+./build/soccer.exe
+
+3. Go back to project directory and run the command:
 python python/web_server.py
 
-cmake --build build
-./build/soccer.exe web

@@ -1,0 +1,74 @@
+Using state file: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\gamestate.txt
+Mode: search
+
+Player: 0
+Vertices: 153
+Current vertex: 97
+Input size: 1531
+
+Legal moves count: 7
+
+Legal moves and heuristic scores:
+0 up :  86 score: 4.9167
+1 up-right :  87 score: 4.4167
+2 right :  98 score: 4.8333
+3 down-right :  109 score: 5.75
+5 down-left :  107 score: 5.75
+6 left :  96 score: 5.3333
+7 up-left :  85 score: 4.9167
+
+
+Searching depth: 1
+search 2 right value: 4.5833
+search 1 up-right value: 4.1667
+search 0 up value: -3.8333
+search 7 up-left value: -3.8333
+search 6 left value: -3.4167
+search 3 down-right value: -3.0
+search 5 down-left value: -3.0
+Completed depth: 1 best move: 2 value: 4.5833 time: 0.0 s
+
+Searching depth: 2
+search 2 right value: 4.1667
+search 1 up-right value: 4.5833
+search 0 up value: -3.5
+search 7 up-left value: 4.25
+search 6 left value: -2.5
+search 3 down-right value: -2.9167
+search 5 down-left value: -2.5
+Completed depth: 2 best move: 1 value: 4.5833 time: 0.01 s
+
+Searching depth: 3
+search 2 right value: 4.5833
+search 1 up-right value: 4.5833
+search 0 up value: -3.8333
+search 7 up-left value: -3.8333
+search 6 left value: -3.4167
+search 3 down-right value: -3.3333
+search 5 down-left value: -3.0
+Completed depth: 3 best move: 2 value: 4.5833 time: 0.07 s
+
+Searching depth: 4
+search 2 right value: -3.0
+search 1 up-right value: -2.9167
+search 0 up value: -3.3333
+search 7 up-left value: -2.5833
+search 6 left value: -2.1667
+search 3 down-right value: -3.3333
+search 5 down-left value: -1.75
+Completed depth: 4 best move: 5 value: -1.75 time: 0.34 s
+
+Searching depth: 5
+search 2 right value: 4.25
+search 1 up-right value: 4.25
+search 0 up value: -3.5
+search 7 up-left value: 3.4167
+search 6 left value: 4.1667
+search 3 down-right value: -2.4167
+search 5 down-left value: -1.0
+time limit reached after depth: 5
+
+Selected move: 5 down-left
+Score: -1.75
+
+Saved move to: C:\Users\patry\OneDrive\Pulpit\UNI\sem4\AppliedMachineLearning\paper-soccer-ai\cpp\move.txt

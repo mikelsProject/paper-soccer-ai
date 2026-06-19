@@ -6,7 +6,7 @@ requires that python .venv would be:
 -on windows: Inside the project directory (so parallel to python, cpp directories)
 -on linux: Parallel to the project directory
 
-To change the path modife this section of code in main.cpp file:
+To change this - modify the path in this section of code in main.cpp file:
 
     bool run_python_bot(const std::string& botMode, int maxDepth, double timeLimit)
     {
